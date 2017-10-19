@@ -52,7 +52,17 @@ def run_network(batch_size = 10):
 
 	paths, x, y = dataset.__getitem__(10)
 	x, y = Variable(x.cuda()), Variable(y.cuda())
+	
+	#there are some parameters that are not fixed during training
+	#this function fixes them 
+	net.eval()
 
-	net(x)
+	#this function basically runs the network on the batch
+	#however, you can run it on a single example just passing 
+	#one input without changing anything to the model
+	result = net(x[1,:,:,:])
+
+	#and see the output dimension
+	print result.size()
 				
 run_network()
