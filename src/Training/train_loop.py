@@ -45,7 +45,11 @@ def train_loop(     train_dataset_stream,
 			optimizer.zero_grad()
 			net_output = net(x)
 
-			more_error = .0001*torch.abs(net_output.sum() - y.sum())
+			
+			# if net_output.sum().data[0]<1.0:
+			more_error = 0.0001*torch.abs(net_output.sum() - y.sum())
+			# else:
+			# 	more_error = 0
 
 			error = loss(net_output, y) + more_error
 						
@@ -54,7 +58,7 @@ def train_loop(     train_dataset_stream,
 
 			error_training.append(error.data[0])
 
-			if n==0 and ((epoch+1) % model_save_period==0):
+			if n==0 and ((epoch+1) % model_save_period==0 or epoch==0):
 				a = torch.FloatTensor(64,64)
 				a.copy_(net_output.data[0,:,:])
 				ax = plt.subplot(2,2,1)
@@ -67,7 +71,7 @@ def train_loop(     train_dataset_stream,
 				ax = plt.subplot(2,2,3)
 				a.copy_(x.data[0,0,0,:,:])
 				ax.imshow(a.numpy())
-				
+
 				plt.savefig(os.path.join(logger, 'training_%d.png'%epoch))
 						
 		#Validation step
@@ -83,7 +87,7 @@ def train_loop(     train_dataset_stream,
 
 				error_validation.append(error.data[0])
 
-				if n==0 and ((epoch+1) % model_save_period==0):
+				if n==0 and ((epoch+1) % model_save_period==0 or epoch==0):
 					a = torch.FloatTensor(64,64)
 					a.copy_(net_output.data[0,:,:])
 					ax = plt.subplot(2,2,1)

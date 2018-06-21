@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 
 
-from src.Models import BasicModel
+from src.Models import BasicModel, SimpleModel
 
 def main(	batch_size = 10,
 			cuda_dev = 0,
@@ -37,7 +37,7 @@ def main(	batch_size = 10,
 	if not os.path.exists(full_exp_log_dir):
 		os.mkdir(full_exp_log_dir)
 	
-	net = BasicModel()
+	net = SimpleModel()
 	if restart:
 		epoch = 100
 		state_dict = torch.load(os.path.join(MODELS_DIR, load_dir, 'net_epoch_%d.pth'%(epoch)))
@@ -49,7 +49,7 @@ def main(	batch_size = 10,
 				net = net,
 				loss = nn.L1Loss(),
 				cuda_dev = cuda_dev,
-				learning_rate = 0.01,
+				learning_rate = 0.001,
 				start_epoch = 0,
 				max_epoch = 300,
 				batch_size = batch_size,
