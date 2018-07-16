@@ -19,14 +19,14 @@ import random
 random.seed(42)
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
-from src.Dataset import get_dataset_file
+from src import DATA_DIR
 
 logger = logging.getLogger(__name__)
 
 if __name__=='__main__':
-    data_folder = get_dataset_file("data_folder")
-    training_list_path = get_dataset_file("training_set")
-    validation_list_path = get_dataset_file("validation_set")
+    data_folder = os.path.join(DATA_DIR, 'pkls')
+    training_list_path = os.path.join(data_folder, 'training_set.dat')
+    validation_list_path = os.path.join(data_folder, 'validation_set.dat')
     data_list = listdir(data_folder)
     
     fraction = 0.8

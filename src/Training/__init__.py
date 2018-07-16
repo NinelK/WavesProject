@@ -1,1 +1,2 @@
 from PriorTrainer import PriorTrainer
+from VAETrainer import VAETrainer
