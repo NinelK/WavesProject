@@ -30,17 +30,17 @@ class VAEModel(nn.Module):
 		)
 
 		self.lstm_encode = torch.nn.LSTM(	input_size = 64, 
-									hidden_size = 32, 
-									num_layers = 1, 
+									hidden_size = 16, 
+									num_layers = 2, 
 									batch_first = True,
 									bidirectional = False)
 
-		self.fc_encode_mu = nn.Sequential(nn.Linear(32, 16), nn.ReLU())
-		self.fc_encode_sigma = nn.Sequential(nn.Linear(32, 16), nn.ReLU())
+		self.fc_encode_mu = nn.Sequential(nn.Linear(16, 8), nn.ReLU())
+		self.fc_encode_sigma = nn.Sequential(nn.Linear(16, 8), nn.ReLU())
 
-		self.lstm_decode = torch.nn.LSTM(	input_size = 16, 
+		self.lstm_decode = torch.nn.LSTM(	input_size = 8, 
 											hidden_size = 64, 
-											num_layers = 1, 
+											num_layers = 2, 
 											batch_first = True,
 											bidirectional = False)
 
@@ -97,6 +97,7 @@ class VAEModel(nn.Module):
 
 		deconv_out = self.deconv(lstm_output)
 		y = deconv_out.resize(batch_size, num_frames, 86, 86)
+
 		return y
 
 	def reparameterize(self, mu, sigma):

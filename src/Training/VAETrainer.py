@@ -40,7 +40,7 @@ class VAETrainer:
 			self.log.close()
 		
 	# @profile
-	def optimize(self, data):
+	def optimize(self, data, mask):
 		"""
 		Optimization step. 
 		Input: data
@@ -51,8 +51,14 @@ class VAETrainer:
 		self.optimizer.zero_grad()
 		_, x = data
 		x = Variable(x.cuda())
+
+		#W = 86
+		#xx, yy = np.ogrid[:W,:W]
+		#mask = torch.from_numpy(np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32"))
+		mask = Variable(mask.cuda())
 						
 		pred, mu, sigma = self.image_model(x)
+		pred = pred * mask
 		L = self.loss_model(pred, x, mu, sigma)
 		
 		L.backward()
@@ -63,7 +69,7 @@ class VAETrainer:
 		self.optimizer.step()
 		return L.data[0]
 
-	def predict(self, data):
+	def predict(self, data, mask):
 		"""
 		Prediction step. 
 		Input: data
@@ -73,8 +79,11 @@ class VAETrainer:
 		self.loss_model.eval()
 		path, x = data
 		x = Variable(x.cuda())
-						
+
+		mask = Variable(mask.cuda())
+
 		pred, mu, sigma = self.image_model(x)
+		pred = pred * mask
 		L = self.loss_model(pred, x, mu, sigma)
 						
 		if not self.log is None:

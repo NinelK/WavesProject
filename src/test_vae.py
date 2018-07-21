@@ -67,8 +67,12 @@ if __name__=='__main__':
 		raise(Exception("dataset not found", data_path))
 	
 	stream_valid = get_stream(data_path, 'validation_set.dat')
-	
+
+	W = 86
+        xx, yy = np.ogrid[:W,:W]
+        mask = torch.from_numpy(np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32"))	
+
 	trainer.new_log(os.path.join(EXP_DIR,"test_loss.dat"), log_dir=os.path.join(EXP_DIR,'test'))
 	for data in tqdm(stream_valid):
-		trainer.predict(data)
+		trainer.predict(data, mask)
 		

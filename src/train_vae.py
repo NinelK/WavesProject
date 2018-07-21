@@ -25,7 +25,7 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
 
-	torch.cuda.set_device(0)
+	torch.cuda.set_device(1)
 	
 	EXP_DIR = os.path.join(LOG_DIR, args.experiment)
 	MDL_DIR = os.path.join(MODELS_DIR, args.experiment)
@@ -59,7 +59,11 @@ if __name__=='__main__':
 		
 	stream_train = get_stream(data_path, 'training_set.dat')
 	stream_valid = get_stream(data_path, 'validation_set.dat')
-	
+
+	W = 86
+        xx, yy = np.ogrid[:W,:W]
+        mask = torch.from_numpy(np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32"))
+        #mask = Variable(mask.cuda())	
 
 	for epoch in xrange(args.max_epoch):
 		loss_train = []
@@ -67,11 +71,11 @@ if __name__=='__main__':
 		
 		trainer.new_log(os.path.join(EXP_DIR,"training_loss%d.dat"%epoch))
 		for data in tqdm(stream_train):
-			loss_train.append(trainer.optimize(data))
+			loss_train.append(trainer.optimize(data, mask))
 		
 		trainer.new_log(os.path.join(EXP_DIR,"validation_loss%d.dat"%epoch))
 		for data in tqdm(stream_valid):
-			loss_valid.append(trainer.predict(data))
+			loss_valid.append(trainer.predict(data, mask))
 		
 		print 'Loss train = %f\n Loss valid = %f\n'%(np.mean(loss_train), np.mean(loss_valid))
 

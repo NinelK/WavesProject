@@ -1,6 +1,8 @@
 import os
 import sys
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 from scipy.stats import pearsonr, spearmanr
 from matplotlib import pylab as plt
 import seaborn as sea

@@ -1,6 +1,8 @@
 import os
 import sys
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 from scipy.stats import pearsonr, spearmanr
 from matplotlib import pylab as plt
 import seaborn as sea
@@ -55,7 +57,7 @@ def plot_training_loss(experiment_name='Test', filename='training_loss.dat'):
 	plt.xlabel('epoch')
 	plt.ylabel('loss')
 	plt.legend()
-	plt.show()
+	plt.savefig('../plot.png')
 
 if __name__=='__main__':
 	experiment_name='VAETest'
