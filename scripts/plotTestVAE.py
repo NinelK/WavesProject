@@ -51,5 +51,5 @@ def plot_gifs(experiment_name='Test', test_name='test'):
 
 if __name__=='__main__':
 	experiment_name='VAETest'
-	plot_gifs(experiment_name=experiment_name)
+	plot_gifs(experiment_name=experiment_name, test_name='train')
 

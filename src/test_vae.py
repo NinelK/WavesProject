@@ -66,9 +66,9 @@ if __name__=='__main__':
 	if not os.path.exists(data_path):
 		raise(Exception("dataset not found", data_path))
 	
-	stream_valid = get_stream(data_path, 'validation_set.dat')
+	stream_valid = get_stream(data_path, 'training_set.dat')
 	
-	trainer.new_log(os.path.join(EXP_DIR,"test_loss.dat"), log_dir=os.path.join(EXP_DIR,'test'))
+	trainer.new_log(os.path.join(EXP_DIR,"test_loss.dat"), log_dir=os.path.join(EXP_DIR,'train'))
 	for data in tqdm(stream_valid):
 		trainer.predict(data)
 		
