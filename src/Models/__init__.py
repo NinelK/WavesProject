@@ -7,3 +7,5 @@ from image_model_dcgan import dcgan
 
 from vae_model import VAEModel
 from vae_loss_model import VAELossModel
+
+from center_model import CenterModel

@@ -28,7 +28,7 @@ class WavesDataset(Dataset):
 	"""
 	The class that samples the data
 	"""
-	def __init__(self, dataset_dir, answers_dir, list_path):
+	def __init__(self, dataset_dir, list_path):
 		"""
 		Loads dataset description
 		@Arguments:
@@ -37,7 +37,7 @@ class WavesDataset(Dataset):
 		"""
 
 		self.dataset_dir = dataset_dir
-		self.dataset_ans = answers_dir
+		
 		self.list_path = list_path
 		self.targets = []
 		
@@ -79,7 +79,7 @@ class WavesDataset(Dataset):
 		
 
 		
-		return path, torch_x[0,:,:], torch_y
+		return torch_x[0,:,:], torch_y
 		
 		
 	def __len__(self):
@@ -96,8 +96,8 @@ class WavesDataset(Dataset):
 		
 		
 
-def get_stream(dataset_dir, answers_dir, list_name, batch_size = 10, shuffle = True):
-	dataset = WavesDataset(dataset_dir, answers_dir, list_name)
+def get_stream_center(dataset_dir, list_name, batch_size = 10, shuffle = True):
+	dataset = WavesDataset(dataset_dir, list_name)
 	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=0)
 	return trainloader
 
@@ -110,7 +110,7 @@ if __name__=='__main__':
 	dataset_dir = os.path.join(DATA_DIR, 'data5', 'pkls')
 	answers_dir = os.path.join(DATA_DIR, 'data5', 'answers')
 	list_name = 'training_set.dat'
-	dataiter = iter(get_stream(dataset_dir, answers_dir, list_name, 10, False))
+	dataiter = iter(get_stream(dataset_dir, list_name, 10, False))
 	path, x, y = dataiter.next()
 
 	print 'Input batch size:', x.size()

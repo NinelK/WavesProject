@@ -1,2 +1,1 @@
-from PriorTrainer import PriorTrainer
-from VAETrainer import VAETrainer
+from CenterTrainer import CenterTrainer
