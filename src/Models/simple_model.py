@@ -30,14 +30,15 @@ class SimpleModel(nn.Module):
 		# 	# nn.Upsample(size=(64,64),mode='bilinear')
 		# )
 		# self.pad = nn.ZeroPad2d((2, 2, 2, 2))
-		self.upsample = nn.Upsample(size=(64,64), mode='bilinear')
+		self.upsample = nn.Upsample(size=(86,86), mode='bilinear')
 
-	def forward(self, input):
+	def forward(self, input, mask):
 		conv_out = self.conv3d(input)
 		conv_out = conv_out.squeeze()
 		# print conv_out.size()
 		conv_out = self.conv2d(conv_out)
 		# deconv_out = self.deconv(conv_out)
 		
-		deconv_out = self.upsample(conv_out)
+		deconv_out = self.upsample(conv_out) * mask
+
 		return deconv_out.squeeze()

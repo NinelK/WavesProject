@@ -1,6 +1,9 @@
 import os
 import sys
 
+import matplotlib
+matplotlib.use('Agg')
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 from src import *
 from src.Dataset import get_dataset_file
@@ -37,7 +40,7 @@ def main(	batch_size = 10,
 	if not os.path.exists(full_exp_log_dir):
 		os.mkdir(full_exp_log_dir)
 	
-	net = SimpleModel()
+	net = BasicModel()
 	if restart:
 		epoch = 100
 		state_dict = torch.load(os.path.join(MODELS_DIR, load_dir, 'net_epoch_%d.pth'%(epoch)))
@@ -49,9 +52,9 @@ def main(	batch_size = 10,
 				net = net,
 				loss = nn.L1Loss(),
 				cuda_dev = cuda_dev,
-				learning_rate = 0.001,
+				learning_rate = 0.0001,
 				start_epoch = 0,
-				max_epoch = 300,
+				max_epoch = 500,
 				batch_size = batch_size,
 				model_save_period = 10,
 				model_save_dir = models_dir_path,

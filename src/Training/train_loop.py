@@ -34,6 +34,13 @@ def train_loop(     train_dataset_stream,
 
 	total_error_train = []
 	total_error_val = []
+
+	W = 86
+	xx, yy = np.ogrid[:W,:W]
+	sel = np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32")
+	mask = torch.from_numpy(sel)
+	mask = Variable(mask.cuda())
+
 	for epoch in range(start_epoch, max_epoch):
 		#Training step
 		net.train()
@@ -41,10 +48,9 @@ def train_loop(     train_dataset_stream,
 		for n,data in tqdm(enumerate(train_dataset_stream), total=len(train_dataset_stream)):
 			paths, x, y = data
 			x, y = Variable(x.cuda()), Variable(y.cuda())
-		
-			optimizer.zero_grad()
-			net_output = net(x)
 
+			optimizer.zero_grad()
+			net_output = net(x) * mask
 			
 			# if net_output.sum().data[0]<1.0:
 			more_error = 0.0001*torch.abs(net_output.sum() - y.sum())
@@ -59,7 +65,7 @@ def train_loop(     train_dataset_stream,
 			error_training.append(error.data[0])
 
 			if n==0 and ((epoch+1) % model_save_period==0 or epoch==0):
-				a = torch.FloatTensor(64,64)
+				a = torch.FloatTensor(86,86)
 				a.copy_(net_output.data[0,:,:])
 				ax = plt.subplot(2,2,1)
 				ax.imshow(a.numpy())
@@ -82,13 +88,13 @@ def train_loop(     train_dataset_stream,
 				paths, x, y = data
 				x, y = Variable(x.cuda()), Variable(y.cuda())
 
-				net_output = net(x)
+				net_output = net(x) * mask
 				error = loss(net_output, y)
 
 				error_validation.append(error.data[0])
 
 				if n==0 and ((epoch+1) % model_save_period==0 or epoch==0):
-					a = torch.FloatTensor(64,64)
+					a = torch.FloatTensor(86,86)
 					a.copy_(net_output.data[0,:,:])
 					ax = plt.subplot(2,2,1)
 					ax.imshow(a.numpy())
