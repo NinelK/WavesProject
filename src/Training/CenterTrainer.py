@@ -47,11 +47,11 @@ class CenterTrainer:
 		self.image_model.train()
 		self.loss_model.train()
 		self.optimizer.zero_grad()
-		x, y = data
+		_, x, y = data
 		x = Variable(x.cuda())
-		y = Variable(y.cuda())
-
-		coords = self.image_model(x)
+		y = Variable(86.0*y.cuda())
+		
+		coords = 86.0*self.image_model(x)
 		L = self.loss_model(coords, y)
 
 		L.backward()
@@ -70,21 +70,21 @@ class CenterTrainer:
 		"""
 		self.image_model.eval()
 		self.loss_model.eval()
-		x, y = data
+		name, x, y = data
 		x = Variable(x.cuda())
-		y = Variable(y.cuda())
+		y = Variable(86.0*y.cuda())
 
-		coords = self.image_model(x)
+		coords = 86.0*self.image_model(x)
 		L = self.loss_model(coords, y)
 
 		if not self.log is None:
 			self.log.write("Loss\t%f\n"%(L.data[0]))
 
 		if not self.log_dir is None:
-			for i in xrange(pred.size(0)):
-				name = path[i].split('.')[0].split('/')[-1]
-				torch.save(coords[i,:].cpu(), os.path.join(self.log_dir, name+'_pred.th'))
-				torch.save(y[i,:].cpu(), os.path.join(self.log_dir, name+'_grnd.th'))
+			for i in xrange(L.size(0)):
+				torch.save(x[i,:].cpu(), os.path.join(self.log_dir, name[i]+'_x.th'))
+				torch.save(coords[i,:].cpu(), os.path.join(self.log_dir, name[i]+'_pred.th'))
+				torch.save(y[i,:].cpu(), os.path.join(self.log_dir, name[i]+'_y.th'))
 
 		return L.data[0]
 

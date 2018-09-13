@@ -79,7 +79,7 @@ class WavesDataset(Dataset):
 		
 
 		
-		return torch_x[0,:,:], torch_y
+		return path.split('/')[-1].split('.')[0], torch_x[0,:,:], torch_y
 		
 		
 	def __len__(self):
@@ -96,9 +96,9 @@ class WavesDataset(Dataset):
 		
 		
 
-def get_stream_center(dataset_dir, list_name, batch_size = 10, shuffle = True):
+def get_stream_center(dataset_dir, list_name, batch_size = 32, shuffle = True):
 	dataset = WavesDataset(dataset_dir, list_name)
-	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=0)
+	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=12)
 	return trainloader
 
 

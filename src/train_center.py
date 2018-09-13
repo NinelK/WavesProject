@@ -22,6 +22,8 @@ if __name__=='__main__':
 	parser.add_argument('-lr', default=0.0001, help='Learning rate', type=float)
 	parser.add_argument('-max_epoch', default=100, help='Max epoch', type=int)
 	parser.add_argument('-save_interval', default=10, help='Model saving interval in epochs', type=int)
+	
+	parser.add_argument('-test_epoch', default=None, help='Test model', type=int)
 
 	args = parser.parse_args()
 
@@ -39,25 +41,33 @@ if __name__=='__main__':
 		pass
 
 	if args.image_model == 'Simple':
-		image_model = CenterModel().cuda()
+		image_model = CenterModel(batch_size=32)
 	else:
 		raise(Exception("unknown image model", args.image_model))
 	
 
-	trainer = CenterTrainer(	image_model = image_model,
+	trainer = CenterTrainer(	image_model = image_model.cuda(),
 								loss_model = torch.nn.MSELoss().cuda(),
 								lr=float(args.lr))
 		
 	
-		
+	
 	
 	data_path = os.path.join(DATA_DIR, args.dataset_dir)
 	if not os.path.exists(data_path):
 		raise(Exception("dataset not found", data_path))
 		
-	stream_train = get_stream_center(data_path, 'training_set.dat')
-	stream_valid = get_stream_center(data_path, 'validation_set.dat')
+	stream_train = get_stream_center(data_path, 'training_set.dat', batch_size=32)
+	stream_valid = get_stream_center(data_path, 'validation_set.dat', batch_size=32)
 	
+	if not args.test_epoch is None:
+		print 'Testing model epoch = ', args.test_epoch
+		trainer.load_models(args.test_epoch, MDL_DIR)
+		trainer.new_log(os.path.join(EXP_DIR,"validation_loss%d.dat"%args.test_epoch), 
+						os.path.join(EXP_DIR,"validation_loss%d"%args.test_epoch))
+		for data in tqdm(stream_valid):
+			trainer.predict(data)
+		sys.exit()
 
 	for epoch in xrange(args.max_epoch):
 		loss_train = []
