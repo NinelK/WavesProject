@@ -54,7 +54,7 @@ def main(	batch_size = 10,
 				cuda_dev = cuda_dev,
 				learning_rate = 0.001,
 				start_epoch = 0,
-				max_epoch = 500,
+				max_epoch = 200,
 				batch_size = batch_size,
 				model_save_period = 10,
 				model_save_dir = models_dir_path,
@@ -62,8 +62,8 @@ def main(	batch_size = 10,
 
 	
 if __name__=='__main__':
-	main(	batch_size = 10,
-			cuda_dev = 0,
+	main(	batch_size = 25,
+			cuda_dev = 1,
 			experiment_log_dir = 'TestCode',
 			restart = False,
 			load_dir = 'TestCode')
