@@ -11,7 +11,7 @@ class BasicModel(nn.Module):
 	def __init__(self, num_input_channels = 1):
 		super(BasicModel, self).__init__()
 		self.conv = nn.Sequential(
-			nn.Conv3d(num_input_channels, 16, (3,3,3) ),
+			nn.Conv3d(num_input_channels, 16, (3,3,3), dilation = (1,3,3)),
 			nn.BatchNorm3d(16),
 			nn.ReLU(),
 			nn.MaxPool3d( (3,3,3), (2,2,2) ),

@@ -55,7 +55,11 @@ def train_loop(     train_dataset_stream,
 			net_output = net(x) * mask
 			
 			# if net_output.sum().data[0]<1.0:
+			#net_output_nonzero = (net_output > 0.2).float() * 1
+			#y_nonzero = (y > 0.2).float() * 1
+
 			more_error = 0.0001*torch.abs(net_output.sum() - y.sum())
+			# + 0.0001*torch.abs(net_output_nonzero.sum() - y_nonzero.sum())
 			# else:
 			# 	more_error = 0
 

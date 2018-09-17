@@ -41,10 +41,10 @@ def main(	batch_size = 10,
 		os.mkdir(full_exp_log_dir)
 	
 	net = BasicModel()
-	if restart:
-		epoch = 100
-		state_dict = torch.load(os.path.join(MODELS_DIR, load_dir, 'net_epoch_%d.pth'%(epoch)))
-		net.load_state_dict(state_dict)
+	#if restart:
+	#epoch = 120
+	#state_dict = torch.load(os.path.join(MODELS_DIR, load_dir, 'net_epoch_start.pth'))
+	#net.load_state_dict(state_dict)
 	
 
 	train_loop( train_dataset_stream = train_stream,
