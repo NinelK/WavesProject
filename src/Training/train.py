@@ -14,10 +14,10 @@ import torch
 import torch.nn as nn
 
 
-from src.Models import BasicModel, SimpleModel
+from src.Models import BasicModel
 
 def main(	batch_size = 10,
-			cuda_dev = 0,
+			cuda_dev = 1,
 			experiment_log_dir = None,
 			restart = False,
 			load_dir = None
@@ -52,9 +52,9 @@ def main(	batch_size = 10,
 				net = net,
 				loss = nn.L1Loss(),
 				cuda_dev = cuda_dev,
-				learning_rate = 0.001,
+				learning_rate = 0.0001,
 				start_epoch = 0,
-				max_epoch = 200,
+				max_epoch = 300,
 				batch_size = batch_size,
 				model_save_period = 10,
 				model_save_dir = models_dir_path,
@@ -62,7 +62,7 @@ def main(	batch_size = 10,
 
 	
 if __name__=='__main__':
-	main(	batch_size = 25,
+	main(	batch_size = 10,
 			cuda_dev = 1,
 			experiment_log_dir = 'TestCode',
 			restart = False,

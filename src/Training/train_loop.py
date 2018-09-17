@@ -33,6 +33,7 @@ def train_loop(     train_dataset_stream,
 	
 
 	total_error_train = []
+	total_error_Tloss = []
 	total_error_val = []
 
 	W = 86
@@ -45,6 +46,7 @@ def train_loop(     train_dataset_stream,
 		#Training step
 		net.train()
 		error_training = []
+		error_Tloss = []
 		for n,data in tqdm(enumerate(train_dataset_stream), total=len(train_dataset_stream)):
 			paths, x, y = data
 			x, y = Variable(x.cuda()), Variable(y.cuda())
@@ -57,11 +59,16 @@ def train_loop(     train_dataset_stream,
 			# else:
 			# 	more_error = 0
 
-			error = loss(net_output, y) + more_error
+			error_loss = loss(net_output, y)
+
+			#print("%f\n", error_loss/more_error)
+
+			error = error_loss + more_error
 						
 			error.backward()
 			optimizer.step()
 
+			error_Tloss.append(error_loss.data[0])
 			error_training.append(error.data[0])
 
 			if n==0 and ((epoch+1) % model_save_period==0 or epoch==0):
@@ -111,12 +118,15 @@ def train_loop(     train_dataset_stream,
 				
 		print 'Training epoch %d ended'%epoch
 		print 'Training error', np.average(error_training)
+		print 'Training loss', np.average(error_Tloss)
 		print 'Validation error', np.average(error_validation)
-		total_error_train.append(np.average(error_training))
+		#total_error_train.append(np.average(error_training))
+		total_error_Tloss.append(np.average(error_Tloss))
 		total_error_val.append(np.average(error_validation))
 		if (epoch+1) % model_save_period == 0:
 			plt.figure()
-			plt.plot(total_error_train, label = 'train')
+			#plt.plot(total_error_train, label = 'train (all)')
+			plt.plot(total_error_Tloss, label = 'train')
 			plt.plot(total_error_val, label = 'validation')
 			plt.legend()
 			plt.savefig(os.path.join(logger, 'progress.png'))
