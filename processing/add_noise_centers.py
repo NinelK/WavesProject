@@ -7,6 +7,7 @@ import scipy.ndimage
 import scipy.signal 
 import os
 import cPickle as pkl
+from tqdm import tqdm, trange
 #import matplotlib.pyplot as plt
 
 T = 120						#duration of the raw data clips
@@ -15,6 +16,8 @@ Ts = 88						#starting frame, where spiral is already formed&stabilised for sure
 sobel_threshold = 50/4		#threshold for a "sharp" gradient
 #front_threshold = 50/4		#another (similar) threshold for outlining the fronts
 sgma = 3					#gaussian filter size used prior to 
+sigma_MAX = 10.0
+sigma_min = 3.0
 
 #circular mask for a big image
 Wb = 256
@@ -65,7 +68,7 @@ def find_singularities(image,growing):
 	(x, y) = np.where(mask == 1)
 	return ([x[0],y[0]])
 
-for runN in range(372):
+for runN in tqdm(range(120)):
 
 	list = []	# list of centre coordinates
 
@@ -102,21 +105,21 @@ for runN in range(372):
 
 	img = np.zeros(shape=(W,W,3), dtype=np.uint8)
 
-	for i in range(T):
-		noise = np.random.normal(0, 1, size=imagesS[i].shape)*amp - amp/2
-		spnoise = scipy.ndimage.gaussian_filter(noise, sigma=sgmaN)+scipy.ndimage.gaussian_filter(imagesS[i]+noise, sigma=3)
-		noiseP = np.random.normal(0, 1, size=(W,W))*ampP - ampP/2
-		signal = (spnoise+noiseP)
-		min = np.min(signal)
-		max = np.max(signal)
-		signal[signal < (1-po) * min + po * max] = min
-		signal[signal > po * min + (1-po) * max] = max
-		imagesS[i] = signal*selF
+	#for i in range(T):
+	#	noise = np.random.normal(0, 1, size=imagesS[i].shape)*amp - amp/2
+	#	spnoise = scipy.ndimage.gaussian_filter(noise, sigma=sgmaN)+scipy.ndimage.gaussian_filter(imagesS[i]+noise, sigma=3)
+	#	noiseP = np.random.normal(0, 1, size=(W,W))*ampP - ampP/2
+	#	signal = (spnoise+noiseP)
+	#	min = np.min(signal)
+	#	max = np.max(signal)
+	#	signal[signal < (1-po) * min + po * max] = min
+	#	signal[signal > po * min + (1-po) * max] = max
+	#	imagesS[i] = signal*selF
 		
-	for i in range(W):
-		for j in range(W):
-			signal = imagesS[:,i,j]
-			imagesS[:,i,j] = normal(signal)
+	#for i in range(W):
+	#	for j in range(W):
+	#		signal = imagesS[:,i,j]
+	#		imagesS[:,i,j] = normal(signal)
 
 	#MAKE CLIPS
 
@@ -134,9 +137,9 @@ for runN in range(372):
 		#make one-hot image
 		sing[int(np.mean(cX)),int(np.mean(cY))] = 1
 		#choose the maximum deviation of the center over the duration of a short (dur) clip
-		sigma_center = np.max((np.std(cX),np.std(cY)))
+		sigma_center = np.max((np.std(cX),np.std(cY),sigma_min))
 
-		if sigma_center < 40.0:							#if deviation is not enormously big, the center was most likely detected correctly
+		if sigma_center < sigma_MAX:						#if deviation is not enormously big, the center was most likely detected correctly
 			listS.append(1)
 			#print(sigma_center)
 			#apply gaussian filter to one-hot image and renormalize
@@ -173,6 +176,6 @@ for runN in range(372):
 
 		else:
 			listS.append(0)	#fail
-
-	print("%d done, %dp success" % (runN,sum(listS)/len(listS)*100))
+	if sum(listS)!=len(listS):
+		print("%d done, %dp success" % (runN,sum(listS)/len(listS)*100))
 
