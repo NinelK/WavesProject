@@ -7,11 +7,14 @@ import torch.optim as optim
 from torch.autograd import Variable
 import numpy as np
 
+import matplotlib
+matplotlib.use('Agg')
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 import src
 from src.Dataset import get_dataset_file
-from src.Dataset.waves_dataset import WavesDataset
-import matplotlib.pylab as plt
+from src.Dataset.waves_dataset import get_stream
+import matplotlib.pyplot as plt
 
 from src.Models import BasicModel
 
@@ -47,10 +50,12 @@ def run_network(batch_size = 10):
 	w = list(net.parameters())
 	#print(w)
 
-	data_folder = get_dataset_file('data_folder')
-	dataset = WavesDataset(data_folder, "/home/nina/ML/WavesProject/dataset/exp.csv")
+	#data_folder = get_dataset_file('data_folder')
+	#dataset = WavesDataset(data_folder, "/home/nina/ML/WavesProject/dataset/exp.csv")
 
-	#paths, x, y = dataset.__getitem__(9)
+        dataiter = iter(get_stream("/home/nina/ML/WavesProject/dataset/exp.csv", 10, False))
+        path, x, y = dataiter.next()
+	
 	print(np.shape(x))
 	x, y = Variable(x.cuda()), Variable(y.cuda())
 
@@ -78,14 +83,10 @@ def run_network(batch_size = 10):
 		ax.imshow(a.numpy())
 		
 		ax = plt.subplot(2,2,2)
-		a.copy_(y.data[i,:,:])
-		ax.imshow(a.numpy())
-
-		ax = plt.subplot(2,2,3)
 		a.copy_(x.data[i,0,0,:,:])
 		ax.imshow(a.numpy())
 	
-		plt.savefig(os.path.join(logger, 'exp_%d.png'%i))
+		plt.savefig('exp_%d.png'%i)
 
 	#and see the output dimension
 	print result.size()
