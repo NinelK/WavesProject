@@ -42,9 +42,9 @@ def main(	batch_size = 10,
 	
 	net = BasicModel()
 	#if restart:
-	#epoch = 120
-	#state_dict = torch.load(os.path.join(MODELS_DIR, load_dir, 'net_epoch_start.pth'))
-	#net.load_state_dict(state_dict)
+	#epoch = 90
+	state_dict = torch.load(os.path.join(MODELS_DIR, load_dir, 'net_epoch_start.pth'))
+	net.load_state_dict(state_dict)
 	
 
 	train_loop( train_dataset_stream = train_stream,
@@ -63,7 +63,7 @@ def main(	batch_size = 10,
 	
 if __name__=='__main__':
 	main(	batch_size = 10,
-			cuda_dev = 1,
+			cuda_dev = 0,
 			experiment_log_dir = 'TestCode',
 			restart = False,
 			load_dir = 'TestCode')

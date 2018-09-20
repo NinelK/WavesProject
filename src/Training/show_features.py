@@ -40,7 +40,7 @@ def run_network(batch_size = 10):
 	net = BasicModel()
 	net = net.cuda()
 
-	epoch = 190
+	epoch = 170
 	state_dict = torch.load('/home/nina/ML/WavesProject/models/TestCode/net_epoch_%d.pth'%(epoch))
 	net.load_state_dict(state_dict)
 
@@ -48,10 +48,17 @@ def run_network(batch_size = 10):
 	#print(w)
 
 	data_folder = get_dataset_file('data_folder')
-	dataset = WavesDataset(data_folder, "/home/nina/ML/WavesProject/dataset/training.csv")
+	dataset = WavesDataset(data_folder, "/home/nina/ML/WavesProject/dataset/exp.csv")
 
-	paths, x, y = dataset.__getitem__(10)
+	#paths, x, y = dataset.__getitem__(9)
+	print(np.shape(x))
 	x, y = Variable(x.cuda()), Variable(y.cuda())
+
+	W = 86
+	xx, yy = np.ogrid[:W,:W]
+	sel = np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32")
+	mask = torch.from_numpy(sel)
+	mask = Variable(mask.cuda())
 	
 	#there are some parameters that are not fixed during training
 	#this function fixes them 
@@ -60,7 +67,25 @@ def run_network(batch_size = 10):
 	#this function basically runs the network on the batch
 	#however, you can run it on a single example just passing 
 	#one input without changing anything to the model
-	result = net(x[1,:,:,:])
+	result = net(x) * mask
+	#net(x[1,:,:,:])
+
+	for i in range(10):
+
+		a = torch.FloatTensor(86,86)
+		a.copy_(result.data[i,:,:])
+		ax = plt.subplot(2,2,1)
+		ax.imshow(a.numpy())
+		
+		ax = plt.subplot(2,2,2)
+		a.copy_(y.data[i,:,:])
+		ax.imshow(a.numpy())
+
+		ax = plt.subplot(2,2,3)
+		a.copy_(x.data[i,0,0,:,:])
+		ax.imshow(a.numpy())
+	
+		plt.savefig(os.path.join(logger, 'exp_%d.png'%i))
 
 	#and see the output dimension
 	print result.size()

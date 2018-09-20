@@ -85,7 +85,7 @@ class WavesDataset(Dataset):
 def get_stream(data_list_path, batch_size = 10, shuffle = True):
 	data_folder = get_dataset_file('data_folder')
 	dataset = WavesDataset(data_folder, data_list_path)
-	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=4)
+	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=6)
 	return trainloader
 
 

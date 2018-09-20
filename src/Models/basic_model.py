@@ -16,10 +16,10 @@ class BasicModel(nn.Module):
 			nn.ReLU(),
 			nn.MaxPool3d( (3,3,3), (2,2,2) ),
 
-			nn.Conv3d(16, 32, (3,3,3)),
+			nn.Conv3d(16, 32, (1,3,3)),
 			nn.BatchNorm3d(32),
 			nn.ReLU(),
-			nn.MaxPool3d((2,3,3), (1,2,2))
+			nn.MaxPool3d((1,3,3), (1,2,2))
 		)
 
 		self.deconv = nn.Sequential(
@@ -34,5 +34,6 @@ class BasicModel(nn.Module):
 	def forward(self, input):
 		conv_out = self.conv(input)
 		conv_out = conv_out.squeeze()
+		#print(conv_out.size())
 		deconv_out = self.deconv(conv_out)
 		return deconv_out.squeeze()
