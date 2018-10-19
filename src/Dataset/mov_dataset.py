@@ -63,7 +63,10 @@ class WavesDataset(Dataset):
 		path = self.targets[index]
 		with open(path, 'r') as fin:
 			data = pkl.load(fin)
-		torch_x = torch.from_numpy(data["in"].astype('float32'))/100.0
+		torch_x = torch.from_numpy(data["in"].astype('float32')) #/100.0
+		#data_size = data["in"].shape
+		#print(np.min(data["in"]))
+		#torch_x = torch.from_numpy(data["in"][0].reshape((1, data_size[1], data_size[2])).astype('float32')) #/100.0
 				
 		return path, torch_x
 		
@@ -92,7 +95,7 @@ if __name__=='__main__':
 	"""
 	Testing data load procedure
 	"""
-	dataset_dir = os.path.join(DATA_DIR, 'pkls')
+	dataset_dir = os.path.join(DATA_DIR, '')
 	list_name = 'training_set.dat'
 	
 	dataiter = iter(get_stream(dataset_dir, list_name, 10, False))

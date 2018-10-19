@@ -17,14 +17,14 @@ if __name__=='__main__':
 	parser.add_argument('-experiment', default='VAETest', help='Experiment name')
 	
 	parser.add_argument('-image_model', default='Simple', help='Image prediction model')
-	parser.add_argument('-dataset_dir', default='pkls', help='Image prediction model')
+	parser.add_argument('-dataset_dir', default="", help='Image prediction model')
 			
 	parser.add_argument('-load_epoch', default=None, help='Max epoch', type=int)
 	
 
 	args = parser.parse_args()
 
-	torch.cuda.set_device(0)
+	torch.cuda.set_device(1)
 	
 	EXP_DIR = os.path.join(LOG_DIR, args.experiment)
 	MDL_DIR = os.path.join(MODELS_DIR, args.experiment)
@@ -61,6 +61,7 @@ if __name__=='__main__':
 		trainer.load_models(args.load_epoch, MDL_DIR)
 		epoch = args.load_epoch
 		
+	print(epoch)
 	
 	data_path = os.path.join(DATA_DIR, args.dataset_dir)
 	if not os.path.exists(data_path):
@@ -70,7 +71,7 @@ if __name__=='__main__':
 
 	W = 86
         xx, yy = np.ogrid[:W,:W]
-        mask = torch.from_numpy(np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32"))	
+        mask = torch.from_numpy(np.array((xx-(W)/2)**2 + (yy-(W)/2)**2 < (43)**2).astype("float32"))	
 
 	trainer.new_log(os.path.join(EXP_DIR,"test_loss.dat"), log_dir=os.path.join(EXP_DIR,'test'))
 	for data in tqdm(stream_valid):

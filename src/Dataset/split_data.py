@@ -24,7 +24,7 @@ from src import DATA_DIR
 logger = logging.getLogger(__name__)
 
 if __name__=='__main__':
-    data_folder = os.path.join(DATA_DIR, 'pkls')
+    data_folder = os.path.join(DATA_DIR, '')
     training_list_path = os.path.join(data_folder, 'training_set.dat')
     validation_list_path = os.path.join(data_folder, 'validation_set.dat')
     data_list = listdir(data_folder)

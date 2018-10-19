@@ -17,7 +17,7 @@ if __name__=='__main__':
 	parser.add_argument('-experiment', default='VAETest', help='Experiment name')
 	
 	parser.add_argument('-image_model', default='Simple', help='Image prediction model')
-	parser.add_argument('-dataset_dir', default='pkls', help='Image prediction model')
+	parser.add_argument('-dataset_dir', default="", help='Image prediction model')
 			
 	parser.add_argument('-lr', default=0.0001, help='Learning rate', type=float)
 	parser.add_argument('-max_epoch', default=100, help='Max epoch', type=int)
@@ -81,4 +81,5 @@ if __name__=='__main__':
 
 		if (epoch+1)%args.save_interval==0:
 			trainer.save_models(epoch, MDL_DIR)
+			print 'Epoch %d ended.' % (epoch+1)
 		

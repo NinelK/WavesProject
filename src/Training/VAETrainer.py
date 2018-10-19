@@ -58,7 +58,7 @@ class VAETrainer:
 		mask = Variable(mask.cuda())
 						
 		pred, mu, sigma = self.image_model(x)
-		pred = pred * mask
+		#pred = pred * mask
 		L = self.loss_model(pred, x, mu, sigma)
 		
 		L.backward()
@@ -83,7 +83,7 @@ class VAETrainer:
 		mask = Variable(mask.cuda())
 
 		pred, mu, sigma = self.image_model(x)
-		pred = pred * mask
+		#pred = pred * mask
 		L = self.loss_model(pred, x, mu, sigma)
 						
 		if not self.log is None:
