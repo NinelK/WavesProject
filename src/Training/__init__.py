@@ -1,1 +1,1 @@
-from VAETrainer import VAETrainer
+from .VAETrainer import VAETrainer

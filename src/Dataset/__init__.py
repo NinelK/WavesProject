@@ -1,1 +1,1 @@
-from waves_dataset import get_stream_vae
+from .waves_dataset import get_stream_vae

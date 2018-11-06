@@ -11,7 +11,8 @@ import torch
 from torch.utils.data import Dataset
 import atexit
 import numpy as np
-import cPickle as pkl
+# import pickle as pkl
+import _pickle as pkl
 import matplotlib.pylab as plt
 
 from os import listdir
@@ -61,8 +62,9 @@ class WavesDataset(Dataset):
 		Returns data path, 3d array of data and 2d array answer
 		"""
 		path = self.targets[index]
-		with open(path, 'r') as fin:
-			data = pkl.load(fin)
+		with open(path, 'rb') as fin:
+			data = pkl.load(fin, encoding='latin1')
+		# data = pkl.load(path)
 		
 		data_size = data["in"].shape
 		torch_x = torch.from_numpy(data["in"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))

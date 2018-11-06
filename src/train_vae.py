@@ -57,7 +57,7 @@ if __name__=='__main__':
 	stream_valid = get_stream_vae(data_path, 'validation_set.dat')
 	
 
-	for epoch in xrange(args.max_epoch):
+	for epoch in range(args.max_epoch):
 		loss_train = []
 		loss_valid = []
 		
@@ -69,7 +69,7 @@ if __name__=='__main__':
 		for data in tqdm(stream_valid):
 			loss_valid.append(trainer.predict(data))
 		
-		print 'Loss train = %f\n Loss valid = %f\n'%(np.mean(loss_train), np.mean(loss_valid))
+		print('Loss train = %f\n Loss valid = %f\n'%(np.mean(loss_train), np.mean(loss_valid)))
 
 		if (epoch+1)%args.save_interval==0:
 			trainer.save_models(epoch, MDL_DIR)

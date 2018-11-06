@@ -20,8 +20,8 @@ class VAETrainer:
 		self.log = None
 		self.log_dir = None
 		
-		print 'Optimizer: ADAM'
-		print 'Learning rate = ', self.lr
+		print('Optimizer: ADAM')
+		print('Learning rate = ', self.lr)
 						
 		atexit.register(self.cleanup)
 	
@@ -58,10 +58,10 @@ class VAETrainer:
 		L.backward()
 						
 		if not self.log is None:
-			self.log.write("Loss\t%f\n"%(L.data[0]))
+			self.log.write("Loss\t%f\n"%(L.data))
 			
 		self.optimizer.step()
-		return L.data[0]
+		return L.data
 
 	def predict(self, data):
 		"""
@@ -78,15 +78,22 @@ class VAETrainer:
 		L = self.loss_model(pred, x, mu, logsigma)
 						
 		if not self.log is None:
-			self.log.write("Loss\t%f\n"%(L.data[0]))
+			self.log.write("Loss\t%f\n"%(L.data))
 
 		if not self.log_dir is None:
-			for i in xrange(pred.size(0)):
+			for i in range(pred.size(0)):
 				name = path[i].split('.')[0].split('/')[-1]
 				torch.save(pred[i,:,:].cpu(), os.path.join(self.log_dir, name+'_pred.th'))
 				torch.save(x[i,:,:].cpu(), os.path.join(self.log_dir, name+'_grnd.th'))
+				import matplotlib.pylab as plt
+				fig = plt.figure()
+				ax = plt.axes()
+				f = torch.cat([x[i,:,:].cpu(),pred[i,:,:].cpu()], dim=0).data.numpy()
+				image = ax.imshow(f)
+				# plt.savefig(filename)
+				plt.show()
 			
-		return L.data[0]
+		return L.data
 
 		
 	def get_model_filename(self):
@@ -98,7 +105,7 @@ class VAETrainer:
 		"""
 		torch.save(self.image_model.state_dict(), os.path.join(directory, self.get_model_filename()+'_epoch%d.th'%epoch))
 		torch.save(self.optimizer.state_dict(), os.path.join(directory, self.get_model_filename()+'_optim_epoch%d.th'%epoch))
-		print 'Model saved successfully'
+		print('Model saved successfully')
 
 	def load_models(self, epoch, directory):
 		"""
@@ -106,4 +113,4 @@ class VAETrainer:
 		"""
 		self.image_model.load_state_dict(torch.load(os.path.join(directory, self.get_model_filename()+'_epoch%d.th'%epoch)))
 		self.optimizer.load_state_dict(torch.load(os.path.join(directory, self.get_model_filename()+'_optim_epoch%d.th'%epoch)))
-		print 'Model loaded succesfully'
+		print('Model loaded succesfully')
