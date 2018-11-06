@@ -12,25 +12,15 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from src import LOG_DIR, DATA_DIR
 import torch
 
-def plot_gif(grnd, pred, filename):
+def plot_fig(grnd, pred, filename):
 	fig = plt.figure()
 	ax = plt.axes()
-	data = torch.cat([grnd[0,:,:],pred[0,:,:]], dim=1).data.numpy()
-	
-	image = ax.imshow(data)
-	ttl = ax.set_title('frame %d'%0,animated=True)
+	f = torch.cat([grnd,pred], dim=0).data.numpy()
+	image = ax.imshow(f)
+	# plt.savefig(filename)
+	plt.show()
 
-	def update_plot(i):
-		data = torch.cat([grnd[i,:,:],pred[i,:,:]], dim=1).data.numpy()
-		print torch.mean(pred[i,:,:]), torch.mean(grnd[i,:,:])
-		image.set_data(data)
-		ttl.set_text('frame %d'%i)
-		return image, ttl
-
-	anim = FuncAnimation(fig, update_plot, frames=grnd.size(0), blit=True)
-	anim.save(filename, dpi=80, writer='imagemagick')
-
-def plot_gifs(experiment_name='Test', test_name='test'):
+def plot_figs(experiment_name='Test', test_name='test'):
 	log_dir = os.path.join(LOG_DIR, experiment_name, test_name)
 	pred = {}
 	grnd = {}
@@ -46,10 +36,10 @@ def plot_gifs(experiment_name='Test', test_name='test'):
 			continue
 	
 	for sample_name in grnd.keys():
-		plot_gif(grnd[sample_name], pred[sample_name], sample_name+'.gif')
+		plot_fig(grnd[sample_name], pred[sample_name], sample_name+'.png')
 
 
 if __name__=='__main__':
 	experiment_name='VAETest'
-	plot_gifs(experiment_name=experiment_name, test_name='train')
+	plot_figs(experiment_name=experiment_name, test_name='test')
 

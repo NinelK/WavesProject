@@ -66,6 +66,7 @@ class WavesDataset(Dataset):
 		
 		data_size = data["in"].shape
 		torch_x = torch.from_numpy(data["in"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
+		torch_x = torch_x/torch.max(torch_x)
 		
 		return path.split('/')[-1].split('.')[0], torch_x[0,:,:]
 		
@@ -103,6 +104,7 @@ if __name__=='__main__':
 	print('Input batch size:', x.size())
 	
 	plt.imshow(x[0].numpy())
+	plt.colorbar()
 	plt.show()
 
 	stream = get_stream_vae(dataset_dir, list_name, 10, False)
