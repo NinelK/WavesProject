@@ -27,7 +27,11 @@ if __name__=='__main__':
     data_folder = os.path.join(DATA_DIR, 'data5', 'pkls')
     training_list_path = os.path.join(data_folder, 'training_set.dat')
     validation_list_path = os.path.join(data_folder, 'validation_set.dat')
-    data_list = listdir(data_folder)
+    data_list = []
+    for filename in listdir(data_folder):
+        if filename.find('.pkl')!=-1:
+            data_list.append(filename)
+
     
     fraction = 0.8
     last_training_idx = int(np.floor(len(data_list)*fraction))

@@ -52,8 +52,8 @@ class VAETrainer:
 		_, x = data
 		x = Variable(x.cuda())
 						
-		pred, mu, sigma = self.image_model(x)
-		L = self.loss_model(pred, x, mu, sigma)
+		pred, mu, logsigma = self.image_model(x)
+		L = self.loss_model(pred, x, mu, logsigma)
 		
 		L.backward()
 						
@@ -74,8 +74,8 @@ class VAETrainer:
 		path, x = data
 		x = Variable(x.cuda())
 						
-		pred, mu, sigma = self.image_model(x)
-		L = self.loss_model(pred, x, mu, sigma)
+		pred, mu, logsigma = self.image_model(x)
+		L = self.loss_model(pred, x, mu, logsigma)
 						
 		if not self.log is None:
 			self.log.write("Loss\t%f\n"%(L.data[0]))
@@ -83,7 +83,6 @@ class VAETrainer:
 		if not self.log_dir is None:
 			for i in xrange(pred.size(0)):
 				name = path[i].split('.')[0].split('/')[-1]
-				print name
 				torch.save(pred[i,:,:,:].cpu(), os.path.join(self.log_dir, name+'_pred.th'))
 				torch.save(x[i,:,:,:].cpu(), os.path.join(self.log_dir, name+'_grnd.th'))
 			

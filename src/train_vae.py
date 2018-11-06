@@ -4,7 +4,7 @@ import torch
 import argparse
 from Training import VAETrainer
 from Models import VAEModel, VAELossModel
-from Dataset import get_stream
+from Dataset import get_stream_vae
 from tqdm import tqdm
 from torch import nn
 import numpy as np
@@ -17,7 +17,7 @@ if __name__=='__main__':
 	parser.add_argument('-experiment', default='VAETest', help='Experiment name')
 	
 	parser.add_argument('-image_model', default='Simple', help='Image prediction model')
-	parser.add_argument('-dataset_dir', default='pkls', help='Image prediction model')
+	parser.add_argument('-dataset_dir', default='data5/pkls', help='Image prediction model')
 			
 	parser.add_argument('-lr', default=0.0001, help='Learning rate', type=float)
 	parser.add_argument('-max_epoch', default=100, help='Max epoch', type=int)
@@ -38,12 +38,8 @@ if __name__=='__main__':
 	except:
 		pass
 
-	if args.image_model == 'Simple':
-		image_model = VAEModel().cuda()
-	else:
-		raise(Exception("unknown image model", args.image_model))
-
-
+	
+	image_model = VAEModel().cuda()
 	loss_model = VAELossModel().cuda()
 
 	trainer = VAETrainer(	image_model = image_model,
@@ -57,8 +53,8 @@ if __name__=='__main__':
 	if not os.path.exists(data_path):
 		raise(Exception("dataset not found", data_path))
 		
-	stream_train = get_stream(data_path, 'training_set.dat')
-	stream_valid = get_stream(data_path, 'validation_set.dat')
+	stream_train = get_stream_vae(data_path, 'training_set.dat')
+	stream_valid = get_stream_vae(data_path, 'validation_set.dat')
 	
 
 	for epoch in xrange(args.max_epoch):

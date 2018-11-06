@@ -1,1 +1,1 @@
-from CenterTrainer import CenterTrainer
+from VAETrainer import VAETrainer

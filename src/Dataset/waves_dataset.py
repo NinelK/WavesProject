@@ -49,10 +49,10 @@ class WavesDataset(Dataset):
 		
 		self.dataset_size = len(self.targets)
 		
-		print "Dataset folder: ", self.dataset_dir
-		print "Dataset list path: ", self.list_path
-		print "Dataset size: ", self.dataset_size
-		print "Dataset output type: 3d density maps"
+		print("Dataset folder: ", self.dataset_dir)
+		print("Dataset list path: ", self.list_path)
+		print("Dataset size: ", self.dataset_size)
+		print("Dataset output type: 3d density maps")
 
 		atexit.register(self.cleanup)
 		
@@ -63,23 +63,11 @@ class WavesDataset(Dataset):
 		path = self.targets[index]
 		with open(path, 'r') as fin:
 			data = pkl.load(fin)
-		# print data['in'].shape
-		# print data['out'].shape
 		
 		data_size = data["in"].shape
 		torch_x = torch.from_numpy(data["in"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
-		tmp_output = torch.from_numpy(data["out"].astype('float32'))
 		
-		y_max, y_ind = torch.max(tmp_output, dim=1)
-		x_max, x_ind = torch.max(y_max, dim=0)
-		x = x_ind[0]
-		y = y_ind[x]
-		
-		torch_y = torch.FloatTensor([float(x)/data_size[1],float(y)/data_size[2]])
-		
-
-		
-		return path.split('/')[-1].split('.')[0], torch_x[0,:,:], torch_y
+		return path.split('/')[-1].split('.')[0], torch_x[0,:,:]
 		
 		
 	def __len__(self):
@@ -96,9 +84,9 @@ class WavesDataset(Dataset):
 		
 		
 
-def get_stream_center(dataset_dir, list_name, batch_size = 32, shuffle = True):
+def get_stream_vae(dataset_dir, list_name, batch_size = 32, shuffle = True):
 	dataset = WavesDataset(dataset_dir, list_name)
-	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=12)
+	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=10)
 	return trainloader
 
 
@@ -108,22 +96,19 @@ if __name__=='__main__':
 	"""
 	
 	dataset_dir = os.path.join(DATA_DIR, 'data5', 'pkls')
-	answers_dir = os.path.join(DATA_DIR, 'data5', 'answers')
 	list_name = 'training_set.dat'
-	dataiter = iter(get_stream(dataset_dir, list_name, 10, False))
-	path, x, y = dataiter.next()
+	dataiter = iter(get_stream_vae(dataset_dir, list_name, 10, False))
+	path, x = dataiter.next()
 
-	print 'Input batch size:', x.size()
-	print 'Output batch size', y.size()
-
-	print y[0]
-	# plt.imshow(y[0].numpy())
-	# plt.show()
-
-	plt.imshow(x[0].numpy())
-	plt.plot([y[0,0]*86],[y[0,1]*86], 'ro')
-	plt.show()
+	print('Input batch size:', x.size())
 	
+	plt.imshow(x[0].numpy())
+	plt.show()
+
+	stream = get_stream_vae(dataset_dir, list_name, 10, False)
+	for data in stream:
+		pass
+		
 	
 	
 	

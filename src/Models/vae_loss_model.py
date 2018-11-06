@@ -9,9 +9,9 @@ class VAELossModel(nn.Module):
 		super(VAELossModel, self).__init__()
 		self.BCE = torch.nn.BCELoss(size_average=True)
 
-	def forward(self, recon_x, x, mu, sigma):
+	def forward(self, recon_x, x, mu, logsigma):
 		BCE = self.BCE(recon_x, x)
-		KLD = -0.5 * torch.sum(1 + sigma - mu.pow(2) - sigma.exp())
+		KLD = -0.5 * torch.sum(1 + logsigma - mu.pow(2) - logsigma.exp())
 		
 		return BCE + KLD
 		
