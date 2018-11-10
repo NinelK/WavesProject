@@ -11,7 +11,7 @@ import torch
 from torch.utils.data import Dataset
 import atexit
 import numpy as np
-import cPickle as pkl
+import _pickle as pkl
 
 from os import listdir
 from os.path import isfile
@@ -24,7 +24,7 @@ from src import DATA_DIR
 logger = logging.getLogger(__name__)
 
 if __name__=='__main__':
-    data_folder = os.path.join(DATA_DIR, 'data5', 'pkls')
+    data_folder = os.path.join(DATA_DIR, '')
     training_list_path = os.path.join(data_folder, 'training_set.dat')
     validation_list_path = os.path.join(data_folder, 'validation_set.dat')
     data_list = []

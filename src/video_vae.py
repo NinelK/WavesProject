@@ -19,13 +19,12 @@ if __name__=='__main__':
 	parser.add_argument('-image_model', default='Simple', help='Image prediction model')
 	parser.add_argument('-dataset_dir', default='', help='Image prediction model')
 			
-	parser.add_argument('-lr', default=0.0001, help='Learning rate', type=float)
-	parser.add_argument('-max_epoch', default=100, help='Max epoch', type=int)
-	parser.add_argument('-save_interval', default=10, help='Model saving interval in epochs', type=int)
+	parser.add_argument('-load_epoch', default=None, help='Max epoch', type=int)
+	
 
 	args = parser.parse_args()
 
-	torch.cuda.set_device(1)
+	torch.cuda.set_device(0)
 	
 	EXP_DIR = os.path.join(LOG_DIR, args.experiment)
 	MDL_DIR = os.path.join(MODELS_DIR, args.experiment)
@@ -44,33 +43,28 @@ if __name__=='__main__':
 
 	trainer = VAETrainer(	image_model = image_model,
 							loss_model = loss_model,
-							lr=float(args.lr))
+							lr=0.0)
 		
-	
-		
+	epoch = 0
+	if args.load_epoch is None:
+		for filename in os.listdir(os.path.join(MDL_DIR)):
+			if filename.find('epoch')!=-1:
+				epoch_num = filename[filename.find('epoch') + len('epoch'):filename.rfind('.')]
+				if int(epoch_num)>epoch:
+					epoch = int(epoch_num)
+		trainer.load_models(epoch, MDL_DIR)
+	else:
+		trainer.load_models(args.load_epoch, MDL_DIR)
+		epoch = args.load_epoch
+	print('Loaded from epoch = ', epoch)
 	
 	data_path = os.path.join(DATA_DIR, args.dataset_dir)
 	if not os.path.exists(data_path):
 		raise(Exception("dataset not found", data_path))
-		
-	stream_train = get_stream_vae(data_path, 'training_set.dat')
-	stream_valid = get_stream_vae(data_path, 'validation_set.dat')
 	
-
-	for epoch in range(args.max_epoch):
-		loss_train = []
-		loss_valid = []
-		
-		trainer.new_log(os.path.join(EXP_DIR,"training_loss%d.dat"%epoch))
-		for data in tqdm(stream_train):
-			loss_train.append(trainer.optimize(data))
-		
-		trainer.new_log(os.path.join(EXP_DIR,"validation_loss%d.dat"%epoch))
-		for data in tqdm(stream_valid):
-			loss_valid.append(trainer.predict(data))
-		
-		print('Loss train = %f\n Loss valid = %f\n'%(np.mean(loss_train), np.mean(loss_valid)))
-
-		if (epoch+1)%args.save_interval==0:
-			trainer.save_models(epoch, MDL_DIR)
+	stream_valid = get_stream_vae(data_path, 'video_set.dat')
+	
+	trainer.new_log(os.path.join(EXP_DIR,"test_loss.dat"), log_dir=os.path.join(EXP_DIR,'video'))
+	for data in tqdm(stream_valid):
+		trainer.predict(data)
 		

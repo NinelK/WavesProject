@@ -11,6 +11,7 @@ import torch
 from torch.utils.data import Dataset
 import atexit
 import numpy as np
+from PIL import Image
 # import pickle as pkl
 import _pickle as pkl
 import matplotlib.pylab as plt
@@ -62,17 +63,37 @@ class WavesDataset(Dataset):
 		Returns data path, 3d array of data and 2d array answer
 		"""
 		path = self.targets[index]
-		with open(path, 'rb') as fin:
-			data = pkl.load(fin, encoding='latin1')
-		# data = pkl.load(path)
+		if path.split('.')[-1] == 'pkl':
+			with open(path, 'rb') as fin:
+				data = pkl.load(fin, encoding='latin1')
+			# data = pkl.load(path)
 		
-		data_size = data["in"].shape
-		torch_x = torch.from_numpy(data["in"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
-		torch_x = torch_x/torch.max(torch_x)
+			data_size = data["in"].shape
+			torch_x = torch.from_numpy(data["in"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
+			torch_x = torch_x/torch.max(torch_x)
 		
-		return path.split('/')[-1].split('.')[0], torch_x[0,:,:]
+			data_size = data["out"].shape
+			torch_y = torch.from_numpy(data["out"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
+			torch_y = torch_y/torch.max(torch_y)
 		
+			return path.split('/')[-1].split('.')[0], torch_x[0,:,:], torch_y[0,:,:]
+		elif path.split('.')[-1] == 'png':
+			with open(path, 'rb') as fin:
+				data = np.asarray(Image.open(fin))
 		
+			data_size = data.shape
+			print(data_size)
+			torch_x = torch.from_numpy(data.reshape((data_size[0], data_size[1])).astype('float32'))
+			torch_x = torch_x/torch.max(torch_x)
+		
+			torch_y = torch.from_numpy(data.reshape((data_size[0], data_size[1])).astype('float32'))
+			torch_y = torch_x/torch.max(torch_x)
+			
+			return path.split('/')[-1].split('.')[0], torch_x, torch_y
+		else:
+			print('Wrong file format (pkl or png is needed).')
+			return 0
+
 	def __len__(self):
 		"""
 		Returns length of the dataset
@@ -87,7 +108,7 @@ class WavesDataset(Dataset):
 		
 		
 
-def get_stream_vae(dataset_dir, list_name, batch_size = 32, shuffle = True):
+def get_stream_vae(dataset_dir, list_name, batch_size = 10, shuffle = True):
 	dataset = WavesDataset(dataset_dir, list_name)
 	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=10)
 	return trainloader

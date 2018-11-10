@@ -44,5 +44,5 @@ def plot_figs(experiment_name='Test', test_name='test'):
 
 if __name__=='__main__':
 	experiment_name='VAETest'
-	plot_figs(experiment_name=experiment_name, test_name='test')
+	plot_figs(experiment_name=experiment_name, test_name='video')
 

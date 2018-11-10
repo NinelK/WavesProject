@@ -17,7 +17,7 @@ if __name__=='__main__':
 	parser.add_argument('-experiment', default='VAETest', help='Experiment name')
 	
 	parser.add_argument('-image_model', default='Simple', help='Image prediction model')
-	parser.add_argument('-dataset_dir', default='data5/pkls', help='Image prediction model')
+	parser.add_argument('-dataset_dir', default='', help='Image prediction model')
 			
 	parser.add_argument('-load_epoch', default=None, help='Max epoch', type=int)
 	

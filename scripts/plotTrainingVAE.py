@@ -1,6 +1,8 @@
 import os
 import sys
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 from scipy.stats import pearsonr, spearmanr
 from matplotlib import pylab as plt
 import seaborn as sea
@@ -24,9 +26,9 @@ def read_log(filename):
 	return np.mean(loss)
 
 def dict2list(dict):
-	return [dict[i] for i in xrange(max(dict.keys()))]
+	return [dict[i] for i in range(max(dict.keys()))]
 
-def plot_training_loss(experiment_name='Test', filename='training_loss.dat'):
+def plot_training_loss(experiment_name='VAETest', filename='training_loss.dat'):
 	log_dir = os.path.join(LOG_DIR, experiment_name)
 	loss_train = {}
 	loss_valid = {}
@@ -55,7 +57,8 @@ def plot_training_loss(experiment_name='Test', filename='training_loss.dat'):
 	plt.xlabel('epoch')
 	plt.ylabel('loss')
 	plt.legend()
-	plt.show()
+	#plt.show()
+	plt.savefig('plot.png')
 
 if __name__=='__main__':
 	experiment_name='VAETest'
