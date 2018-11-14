@@ -51,11 +51,11 @@ class VAETrainer:
 		self.optimizer.zero_grad()
 		_, x, y = data
 		x = Variable(x.cuda())				
-		y = Variable(y.cuda())
+		# y = Variable(y.cuda())
 		
 		pred = self.image_model(x)
-		#pred, mu, logsigma = self.image_model(x)
-		L = self.loss_model(pred, y)#, mu, logsigma)
+		pred, mu, logsigma = self.image_model(x)
+		L = self.loss_model(pred, x, mu, logsigma)
 		
 		L.backward()
 						
@@ -75,10 +75,10 @@ class VAETrainer:
 		self.loss_model.eval()
 		path, x, y = data
 		x = Variable(x.cuda())
-		y = Variable(y.cuda())
+		#y = Variable(y.cuda())
 		
-		pred = self.image_model(x)
-		L = self.loss_model(pred, y)#, mu, logsigma)
+		pred, mu, logsigma = self.image_model(x)
+		L = self.loss_model(pred, x, mu, logsigma)
 						
 		if not self.log is None:
 			self.log.write("Loss\t%f\n"%(L.data))

@@ -24,7 +24,7 @@ class VAEModel(nn.Module):
 		)
 
 		self.fc_encode_mu = nn.Sequential(nn.Linear(16*64, 256), nn.ReLU())
-		#self.fc_encode_sigma = nn.Sequential(nn.Linear(128, 64), nn.ReLU())
+		self.fc_encode_sigma = nn.Sequential(nn.Linear(16*64, 256), nn.ReLU())
 
 		self.fc_decode = nn.Sequential(nn.Linear(256, 64*16), nn.ReLU())
 
@@ -50,9 +50,9 @@ class VAEModel(nn.Module):
 		#print(conv_out.size())
 		conv_out = conv_out.view(-1,64*16)#conv_out.squeeze()
 		#print(conv_out.size())
-		#logsigma = self.fc_encode_sigma(conv_out)
+		logsigma = self.fc_encode_sigma(conv_out)
 		mu = self.fc_encode_mu(conv_out)
-		return mu#, logsigma
+		return mu, logsigma
 
 	def decode(self, input):
 		x = self.fc_decode(input)
@@ -74,11 +74,11 @@ class VAEModel(nn.Module):
 
 	def forward(self, input):
 		
-		mu = self.encode(input)
+		mu, logsigma = self.encode(input)
 		
-		#z = self.reparameterize(mu, logsigma)
+		z = self.reparameterize(mu, logsigma)
 		
-		y = self.decode(mu)
+		y = self.decode(z)
 		y = y.squeeze()
 
-		return y#, mu, logsigma
+		return y, mu, logsigma

@@ -72,17 +72,17 @@ class WavesDataset(Dataset):
 			torch_x = torch.from_numpy(data["in"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
 			torch_x = torch_x/torch.max(torch_x)
 		
-			data_size = data["out"].shape
-			torch_y = torch.from_numpy(data["out"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
-			torch_y = torch_y/torch.max(torch_y)
+			#data_size = data["out"].shape
+			#torch_y = torch.from_numpy(data["out"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
+			#torch_y = torch_y/torch.max(torch_y)
 		
-			return path.split('/')[-1].split('.')[0], torch_x[0,:,:], torch_y[0,:,:]
+			return path.split('/')[-1].split('.')[0], torch_x[0,:,:], torch_x[0,:,:]
 		elif path.split('.')[-1] == 'png':
 			with open(path, 'rb') as fin:
 				data = np.asarray(Image.open(fin))
 		
 			data_size = data.shape
-			print(data_size)
+			#print(data_size)
 			torch_x = torch.from_numpy(data.reshape((data_size[0], data_size[1])).astype('float32'))
 			torch_x = torch_x/torch.max(torch_x)
 		
