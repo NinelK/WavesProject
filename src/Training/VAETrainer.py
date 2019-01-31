@@ -87,11 +87,11 @@ class VAETrainer:
 			for i in range(pred.size(0)):
 				name = path[i].split('.')[0].split('/')[-1]
 				torch.save(pred[i,:,:].cpu(), os.path.join(self.log_dir, name+'_pred.th'))
-				torch.save(x[i,:,:].cpu(), os.path.join(self.log_dir, name+'_grnd.th'))
+				torch.save(x[i,0,:,:].cpu(), os.path.join(self.log_dir, name+'_grnd.th'))
 				import matplotlib.pylab as plt
 				fig = plt.figure()
 				ax = plt.axes()
-				f = torch.cat([x[i,:,:].cpu(),pred[i,:,:].cpu()], dim=0).data.numpy()
+				f = torch.cat([x[i,0,:,:].cpu(),pred[i,:,:].cpu()], dim=0).data.numpy()
 				image = ax.imshow(f)
 				# plt.savefig(filename)
 				plt.show()

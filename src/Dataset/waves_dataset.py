@@ -67,27 +67,40 @@ class WavesDataset(Dataset):
 			with open(path, 'rb') as fin:
 				data = pkl.load(fin, encoding='latin1')
 			# data = pkl.load(path)
-		
 			data_size = data["in"].shape
-			torch_x = torch.from_numpy(data["in"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
-			torch_x = torch_x/torch.max(torch_x)
+			gradX,gradY = np.mgrid[0:data_size[1],0:data_size[2]]/np.max(data_size) #normalized
+			data_img = data["in"][0]
+			data_img = data_img/np.max(data_img)
+			IN = np.array([data_img,gradX,gradY])
+
+			if(np.max(data_img) > 1.0):
+				print("Warning! Data out of [0,1] range!")
+
+			torch_x = torch.from_numpy(IN.reshape((3, data_size[1], data_size[2])).astype('float32'))
+			#torch_x = torch_x/torch.max(torch_x[0])
 		
 			data_size = data["out"].shape
 			torch_y = torch.from_numpy(data["out"].reshape((data_size[0], data_size[1], data_size[2])).astype('float32'))
-			torch_y = torch_y/torch.max(torch_y)
+			torch_y = torch_y/torch.max(torch_y[0])
 		
-			return path.split('/')[-1].split('.')[0], torch_x[0,:,:], torch_y[0,:,:]
+			return path.split('/')[-1].split('.')[0], torch_x, torch_y[0,:,:]
 		elif path.split('.')[-1] == 'png':
 			with open(path, 'rb') as fin:
 				data = np.asarray(Image.open(fin))
 		
 			data_size = data.shape
-			print(data_size)
-			torch_x = torch.from_numpy(data.reshape((data_size[0], data_size[1])).astype('float32'))
-			torch_x = torch_x/torch.max(torch_x)
-		
+			gradX,gradY = np.mgrid[0:data_size[0],0:data_size[1]]/np.max(data_size) #normalized
+			data = data/np.max(data)
+			IN = np.array([data,gradX,gradY])
+
+			if(np.max(data) > 1.0):
+				print("Warning! Data out of [0,1] range!")
+
+			torch_x = torch.from_numpy(IN.reshape((3, data_size[0], data_size[1])).astype('float32'))
+			#torch_x = torch_x/torch.max(torch_x[0])
+
 			torch_y = torch.from_numpy(data.reshape((data_size[0], data_size[1])).astype('float32'))
-			torch_y = torch_x/torch.max(torch_x)
+			torch_y = torch_y/torch.max(torch_y[0])
 			
 			return path.split('/')[-1].split('.')[0], torch_x, torch_y
 		else:
@@ -108,7 +121,7 @@ class WavesDataset(Dataset):
 		
 		
 
-def get_stream_vae(dataset_dir, list_name, batch_size = 10, shuffle = True):
+def get_stream_vae(dataset_dir, list_name, batch_size = 25, shuffle = True):
 	dataset = WavesDataset(dataset_dir, list_name)
 	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=10)
 	return trainloader
