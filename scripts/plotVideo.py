@@ -18,10 +18,19 @@ import torch
 def plot_fig(grnd, pred, filename):
 	fig = plt.figure()
 	ax = plt.axes()
+
+	#LossModel = torch.nn.L1Loss(size_average=True)
+	LossModel = torch.nn.BCELoss(size_average=True)
+	#size = grnd.size()
+	loss = LossModel(pred,grnd).data.numpy()
+
 	f = torch.cat([grnd,pred], dim=0).data.numpy()
 	image = ax.imshow(f)
-	plt.savefig(filename)
+	plt.text(0,0,"Loss: %.4f" % loss)
+	plt.savefig("%d_%s" % (np.round(loss*1000)-500,filename))
 	#plt.show()
+
+	return loss
 
 def plot_figs(experiment_name='Test', test_name='test'):
 	log_dir = os.path.join(LOG_DIR, experiment_name, test_name)
@@ -37,9 +46,20 @@ def plot_figs(experiment_name='Test', test_name='test'):
 			pred[sample_name] = torch.load(os.path.join(log_dir,filename))
 		else:
 			continue
-	
+
+	max = 0.0
+	min = 1.0 #normalised Loss < 1
 	for sample_name in tqdm(grnd.keys()):
-		plot_fig(grnd[sample_name], pred[sample_name], sample_name+'.png')
+		loss = plot_fig(grnd[sample_name], pred[sample_name], sample_name+'.png')
+		if loss < min:
+			path_min = sample_name
+			min = loss
+		if loss > max:
+			path_max = sample_name
+			max = loss
+	
+	print("Max loss: %.4f for %s" % (max,path_max))
+	print("Min loss: %.4f for %s" % (min,path_min))
 
 
 if __name__=='__main__':

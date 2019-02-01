@@ -22,10 +22,10 @@ class VAEModel(nn.Module):
 			
 		)
 
-		self.fc_encode_mu = nn.Sequential(nn.Linear(16*64, 1024), nn.ReLU())
+		self.fc_encode_mu = nn.Sequential(nn.Linear(16*64, 10240), nn.ReLU())
 		#self.fc_encode_sigma = nn.Sequential(nn.Linear(128, 64), nn.ReLU())
 
-		self.fc_decode = nn.Sequential(nn.Linear(1024, 64*16), nn.ReLU())
+		self.fc_decode = nn.Sequential(nn.Linear(10240, 64*16), nn.ReLU())
 
 		self.deconv = nn.Sequential(
 			nn.ConvTranspose2d(64, 32, kernel_size = 6, stride = 2, padding = 0, bias=True),
