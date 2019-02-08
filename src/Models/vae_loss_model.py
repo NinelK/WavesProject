@@ -17,5 +17,5 @@ class VAELossModel(nn.Module):
 		# print(BCE)
 		# print(KLD)
 		#L1 = self.L1(recon_x,y)
-		return BCE #L1 #BCE + KLD
+		return BCE # + KLD
 		
