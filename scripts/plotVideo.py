@@ -24,7 +24,7 @@ def plot_fig(grnd, pred, filename):
 	#size = grnd.size()
 	loss = LossModel(pred,grnd).data.numpy()
 
-	f = torch.cat([grnd,pred,torch.abs(grnd-pred)], dim=0).data.numpy()
+	f = torch.cat([grnd,pred], dim=0).data.numpy()
 	image = ax.imshow(f)
 	plt.text(0,0,"Loss: %.4f" % loss)
 	plt.savefig("%d_%s" % (np.round(loss*1000)-500,filename))
