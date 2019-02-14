@@ -20,12 +20,12 @@ if __name__=='__main__':
 	parser.add_argument('-dataset_dir', default='', help='Image prediction model')
 			
 	parser.add_argument('-lr', default=0.0001, help='Learning rate', type=float)
-	parser.add_argument('-max_epoch', default=100, help='Max epoch', type=int)
+	parser.add_argument('-max_epoch', default=500, help='Max epoch', type=int)
 	parser.add_argument('-save_interval', default=10, help='Model saving interval in epochs', type=int)
 
 	args = parser.parse_args()
 
-	torch.cuda.set_device(2)
+	torch.cuda.set_device(1)
 	
 	EXP_DIR = os.path.join(LOG_DIR, args.experiment)
 	MDL_DIR = os.path.join(MODELS_DIR, args.experiment)

@@ -5,7 +5,7 @@ import torch
 
 class VAEModel(nn.Module):
 
-	def __init__(self, num_input_channels = 3):
+	def __init__(self, num_input_channels = 4):
 		super(VAEModel, self).__init__()
 
 		self.max_ch = 64
@@ -14,13 +14,13 @@ class VAEModel(nn.Module):
 		self.k = 2
 
 		self.conv = nn.Sequential(
-			nn.Conv2d(num_input_channels, int(self.max_ch/self.k**2), kernel_size = 4, stride = 2),
+			nn.Conv3d(num_input_channels, int(self.max_ch/self.k**2), kernel_size = (3,4,4), stride = (1,2,2)),
 			nn.ReLU(),
 
-			nn.Conv2d(int(self.max_ch/self.k**2), int(self.max_ch/self.k), kernel_size=4, stride = 2),
+			nn.Conv3d(int(self.max_ch/self.k**2), int(self.max_ch/self.k), kernel_size = (3,4,4), stride = (1,2,2)),
 			nn.ReLU(),
 
-			nn.Conv2d(int(self.max_ch/self.k), self.max_ch, kernel_size=4, stride = 2),
+			nn.Conv3d(int(self.max_ch/self.k), self.max_ch, kernel_size = (1,4,4), stride = (1,2,2)),
 			nn.ReLU(),
 
 		)
@@ -31,23 +31,23 @@ class VAEModel(nn.Module):
 		self.fc_decode = nn.Sequential(nn.Linear(self.h_size, self.max_ch*self.pic_size**2), nn.ReLU())
 
 		self.deconv = nn.Sequential(
-			nn.ConvTranspose2d(self.max_ch, int(self.max_ch/self.k), kernel_size = 4, stride = 2, padding = 0, bias=True),
+			nn.ConvTranspose3d(self.max_ch, int(self.max_ch/self.k), kernel_size = (1,4,4), stride = (1,2,2), padding = 0, bias=True),
 			nn.ReLU(),
 
-			nn.ConvTranspose2d(int(self.max_ch/self.k), int(self.max_ch/self.k**2), kernel_size = 4, stride = 2, padding = 0, bias=True),
+			nn.ConvTranspose3d(int(self.max_ch/self.k), int(self.max_ch/self.k**2), kernel_size = (3,4,4), stride = (1,2,2), padding = 0, bias=True),
 			nn.ReLU(),
 
-			nn.ConvTranspose2d(int(self.max_ch/self.k**2), 1, kernel_size = 4, stride = 2, padding = 0, bias=True),
+			nn.ConvTranspose3d(int(self.max_ch/self.k**2), 1, kernel_size = (3,4,4), stride = (1,2,2), padding = 0, bias=True),
 			nn.Sigmoid(),
 			
-			nn.UpsamplingBilinear2d(size=(86, 86))
+			#nn.UpsamplingBilinear3d(size=(5, 86, 86))
 		)
 
 	def encode(self, input):
 		#input = input.unsqueeze(dim=1)
 		conv_out = self.conv(input)
 		#print(conv_out.size())
-		conv_out = conv_out.view(-1,self.max_ch*self.pic_size**2)#conv_out.squeeze()
+		conv_out = conv_out.view(-1,1,self.max_ch*self.pic_size**2)#conv_out.squeeze()
 		#logsigma = self.fc_encode_sigma(conv_out)
 		mu = self.fc_encode_mu(conv_out)
 		return mu #, logsigma
@@ -55,7 +55,7 @@ class VAEModel(nn.Module):
 	def decode(self, input):
 		x = self.fc_decode(input)
 		#print(x.size())
-		x=x.view(-1,self.max_ch,self.pic_size,self.pic_size)#x = x.unsqueeze(dim=2).unsqueeze(dim=3)
+		x=x.view(-1,self.max_ch,1,self.pic_size,self.pic_size)#x = x.unsqueeze(dim=2).unsqueeze(dim=3)
 		#print(x.size())
 		deconv_out = self.deconv(x)
 		# print(deconv_out.size())
