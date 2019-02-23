@@ -72,11 +72,12 @@ class VAEModel(nn.Module):
 
 	def forward(self, input):
 		
-		mu = self.encode(input)
+		z = self.encode(input)
+		#mu, logsigma = self.encode(input)
 
 		#z = self.reparameterize(mu, logsigma)
 		
-		y = self.decode(mu)
+		y = self.decode(z)
 		y = y.squeeze()
 
-		return y#, mu, logsigma
+		return y #, mu, logsigma

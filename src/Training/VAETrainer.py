@@ -55,7 +55,7 @@ class VAETrainer:
 		
 		pred = self.image_model(x)
 		#pred, mu, logsigma = self.image_model(x)
-		L = self.loss_model(pred, y)#, mu, logsigma)
+		L = self.loss_model(pred, y) #, mu, logsigma)
 		
 		L.backward()
 						
@@ -78,7 +78,8 @@ class VAETrainer:
 		y = Variable(y.cuda())
 		
 		pred = self.image_model(x)
-		L = self.loss_model(pred, y)#, mu, logsigma)
+		#pred, mu, logsigma = self.image_model(x)
+		L = self.loss_model(pred, y) #, mu, logsigma)
 				
 		if not self.log is None:
 			self.log.write("Loss\t%f\n"%(L.data))
@@ -118,3 +119,8 @@ class VAETrainer:
 		self.image_model.load_state_dict(torch.load(os.path.join(directory, self.get_model_filename()+'_epoch%d.th'%epoch)))
 		self.optimizer.load_state_dict(torch.load(os.path.join(directory, self.get_model_filename()+'_optim_epoch%d.th'%epoch)))
 		print('Model loaded succesfully')
+
+	def ablate_weight(self, layer, number):
+	
+		self.image_model.state_dict()[layer][number] = 0
+		print("Ablated %d in %s" % (number,layer))

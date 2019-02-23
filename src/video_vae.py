@@ -24,7 +24,7 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
 
-	torch.cuda.set_device(0)
+	torch.cuda.set_device(1)
 	
 	EXP_DIR = os.path.join(LOG_DIR, args.experiment)
 	MDL_DIR = os.path.join(MODELS_DIR, args.experiment)

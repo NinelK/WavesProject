@@ -20,6 +20,7 @@ if __name__=='__main__':
 	parser.add_argument('-dataset_dir', default='', help='Image prediction model')
 			
 	parser.add_argument('-load_epoch', default=None, help='Max epoch', type=int)
+	parser.add_argument('-ablate', default=None, help='Number of filter to ablate', type=int)
 	
 
 	args = parser.parse_args()
@@ -61,6 +62,16 @@ if __name__=='__main__':
 	data_path = os.path.join(DATA_DIR, args.dataset_dir)
 	if not os.path.exists(data_path):
 		raise(Exception("dataset not found", data_path))
+
+	#dict = image_model.state_dict().items()
+
+	#for d in dict:
+	#	print(d[0])
+	#for i in range(64):
+	#	if i!=args.ablate:
+	#		trainer.ablate_weight('deconv.0.weight',i)
+	#trainer.ablate_weight('deconv.0.weight',args.ablate)
+	#print(image_model.state_dict()['deconv.4.weight'][0])
 	
 	stream_valid = get_stream_vae(data_path, 'validation_set.dat')
 	
