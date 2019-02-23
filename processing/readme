@@ -1,0 +1,4 @@
+1. Put raw data in this folder (folders "sample0", "sample1" ... "sampleN")
+2. mkdir pkls answers
+3. add_noise_centers.py 1) detects centres 2) adds noise to the data, cuts it into short clips, flips-rotates the images
+4. centers_distrib.py reads images with marked centers from "answers" and outputs the distribution (sum of the images, essentially)

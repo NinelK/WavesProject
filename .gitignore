@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 dataset/*
 log/*
+=======
+log/*
+*.tgz
+models/*
+dataset*
+exp_dataset*
+>>>>>>> abad96a8addb4dd04b70da5b6d74b7123a2122cb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

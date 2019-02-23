@@ -33,33 +33,50 @@ def train_loop(     train_dataset_stream,
 	
 
 	total_error_train = []
+	total_error_Tloss = []
 	total_error_val = []
+
+	W = 86
+	xx, yy = np.ogrid[:W,:W]
+	sel = np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32")
+	mask = torch.from_numpy(sel)
+	mask = Variable(mask.cuda())
+
 	for epoch in range(start_epoch, max_epoch):
 		#Training step
 		net.train()
 		error_training = []
+		error_Tloss = []
 		for n,data in tqdm(enumerate(train_dataset_stream), total=len(train_dataset_stream)):
 			paths, x, y = data
 			x, y = Variable(x.cuda()), Variable(y.cuda())
-		
-			optimizer.zero_grad()
-			net_output = net(x)
 
+			optimizer.zero_grad()
+			net_output = net(x) * mask
 			
 			# if net_output.sum().data[0]<1.0:
+			#net_output_nonzero = (net_output > 0.2).float() * 1
+			#y_nonzero = (y > 0.2).float() * 1
+
 			more_error = 0.0001*torch.abs(net_output.sum() - y.sum())
+			# + 0.0001*torch.abs(net_output_nonzero.sum() - y_nonzero.sum())
 			# else:
 			# 	more_error = 0
 
-			error = loss(net_output, y) + more_error
+			error_loss = loss(net_output, y)
+
+			#print("%f\n", error_loss/more_error)
+
+			error = error_loss + more_error
 						
 			error.backward()
 			optimizer.step()
 
+			error_Tloss.append(error_loss.data[0])
 			error_training.append(error.data[0])
 
 			if n==0 and ((epoch+1) % model_save_period==0 or epoch==0):
-				a = torch.FloatTensor(64,64)
+				a = torch.FloatTensor(86,86)
 				a.copy_(net_output.data[0,:,:])
 				ax = plt.subplot(2,2,1)
 				ax.imshow(a.numpy())
@@ -82,13 +99,13 @@ def train_loop(     train_dataset_stream,
 				paths, x, y = data
 				x, y = Variable(x.cuda()), Variable(y.cuda())
 
-				net_output = net(x)
+				net_output = net(x) * mask
 				error = loss(net_output, y)
 
 				error_validation.append(error.data[0])
 
 				if n==0 and ((epoch+1) % model_save_period==0 or epoch==0):
-					a = torch.FloatTensor(64,64)
+					a = torch.FloatTensor(86,86)
 					a.copy_(net_output.data[0,:,:])
 					ax = plt.subplot(2,2,1)
 					ax.imshow(a.numpy())
@@ -105,12 +122,15 @@ def train_loop(     train_dataset_stream,
 				
 		print 'Training epoch %d ended'%epoch
 		print 'Training error', np.average(error_training)
+		print 'Training loss', np.average(error_Tloss)
 		print 'Validation error', np.average(error_validation)
-		total_error_train.append(np.average(error_training))
+		#total_error_train.append(np.average(error_training))
+		total_error_Tloss.append(np.average(error_Tloss))
 		total_error_val.append(np.average(error_validation))
 		if (epoch+1) % model_save_period == 0:
 			plt.figure()
-			plt.plot(total_error_train, label = 'train')
+			#plt.plot(total_error_train, label = 'train (all)')
+			plt.plot(total_error_Tloss, label = 'train')
 			plt.plot(total_error_val, label = 'validation')
 			plt.legend()
 			plt.savefig(os.path.join(logger, 'progress.png'))

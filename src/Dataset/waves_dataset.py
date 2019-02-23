@@ -59,10 +59,10 @@ class WavesDataset(Dataset):
 		Returns data path, 3d array of data and 2d array answer
 		"""
 		path = self.targets[index]
-		with open(path, 'r') as fin:
+		with open(path, 'rb') as fin:
 			data = pkl.load(fin)
 		data_size = data["in"].shape
-		torch_x = torch.from_numpy(data["in"].reshape((1,data_size[0], data_size[1], data_size[2])).astype('float32'))
+		torch_x = torch.from_numpy(data["in"].reshape((1,data_size[0], data_size[1], data_size[2])).astype('float32')) #/100.0
 		torch_y = torch.from_numpy(data["out"].astype('float32'))
 		
 		return path, torch_x, torch_y
@@ -85,7 +85,7 @@ class WavesDataset(Dataset):
 def get_stream(data_list_path, batch_size = 10, shuffle = True):
 	data_folder = get_dataset_file('data_folder')
 	dataset = WavesDataset(data_folder, data_list_path)
-	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=4)
+	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=6)
 	return trainloader
 
 
