@@ -40,7 +40,7 @@ class CentresTrainer:
 			self.log.close()
 		
 	# @profile
-	def optimize(self, data):
+	def optimize(self, data, mask):
 		"""
 		Optimization step. 
 		Input: data
@@ -50,17 +50,16 @@ class CentresTrainer:
 		self.loss_model.train()
 		self.optimizer.zero_grad()
 		_, x, y = data
-		x = x.contiguous()
-		y = y.contiguous()
-		x = Variable(x.cuda().contiguous())				
-		y = Variable(y.cuda().contiguous())
+		x = x
+		y = y
+		x = Variable(x.cuda())				
+		y = Variable(y.cuda())
 		
-		#print(y.size())
-		pred = self.image_model(x)
-		#pred, mu, logsigma = self.image_model(x)
-		L = self.loss_model(pred, y)
+		pred = self.image_model(x) * mask
 
-		L+= 0.0001*torch.abs(pred.sum() - y.sum())
+		more_error = 0.000001*torch.abs(pred.sum() - y.sum())
+
+		L = self.loss_model(pred, y) + more_error
 		
 		L.backward()
 						
@@ -70,7 +69,7 @@ class CentresTrainer:
 		self.optimizer.step()
 		return L.data
 
-	def predict(self, data):
+	def predict(self, data, mask):
 		"""
 		Prediction step. 
 		Input: data
@@ -82,7 +81,7 @@ class CentresTrainer:
 		x = Variable(x.cuda())
 		y = Variable(y.cuda())
 		
-		pred = self.image_model(x)
+		pred = self.image_model(x) * mask
 		L = self.loss_model(pred, y)
 				
 		if not self.log is None:

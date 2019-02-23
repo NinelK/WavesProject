@@ -61,6 +61,6 @@ def plot_training_loss(experiment_name='VAETest', filename='training_loss.dat'):
 	plt.savefig('plot.png')
 
 if __name__=='__main__':
-	experiment_name='VAETest'
+	experiment_name='CentreTest'
 	plot_training_loss(experiment_name=experiment_name)
 

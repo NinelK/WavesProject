@@ -8,6 +8,7 @@ from Dataset import get_stream_centres
 from tqdm import tqdm
 from torch import nn
 import numpy as np
+from torch.autograd import Variable
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from src import CENTRES_DIR, MODELS_DIR, LOG_DIR
@@ -19,12 +20,13 @@ if __name__=='__main__':
 	parser.add_argument('-image_model', default='Simple', help='Image prediction model')
 	parser.add_argument('-dataset_dir', default='', help='Image prediction model')
 			
-	parser.add_argument('-lr', default=0.0001, help='Learning rate', type=float)
-	parser.add_argument('-max_epoch', default=150, help='Max epoch', type=int)
+	parser.add_argument('-lr', default=0.001, help='Learning rate', type=float)
+	parser.add_argument('-max_epoch', default=300, help='Max epoch', type=int)
 	parser.add_argument('-save_interval', default=10, help='Model saving interval in epochs', type=int)
 
 	args = parser.parse_args()
 
+	torch.manual_seed(42)
 	torch.cuda.set_device(1)
 	torch.backends.cudnn.enabled = False
 	
@@ -57,6 +59,11 @@ if __name__=='__main__':
 	stream_train = get_stream_centres(data_path, 'training_set.dat')
 	stream_valid = get_stream_centres(data_path, 'validation_set.dat')
 	
+	W = 86
+	xx, yy = np.ogrid[:W,:W]
+	sel = np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32")
+	mask = torch.from_numpy(sel)
+	mask = Variable(mask.cuda())
 
 	for epoch in range(args.max_epoch):
 		loss_train = []
@@ -64,11 +71,11 @@ if __name__=='__main__':
 		
 		trainer.new_log(os.path.join(EXP_DIR,"training_loss%d.dat"%epoch))
 		for data in tqdm(stream_train):
-			loss_train.append(trainer.optimize(data))
+			loss_train.append(trainer.optimize(data,mask))
 		
 		trainer.new_log(os.path.join(EXP_DIR,"validation_loss%d.dat"%epoch))
 		for data in tqdm(stream_valid):
-			loss_valid.append(trainer.predict(data))
+			loss_valid.append(trainer.predict(data,mask))
 		
 		print('Loss train = %f\n Loss valid = %f\n'%(np.mean(loss_train), np.mean(loss_valid)))
 

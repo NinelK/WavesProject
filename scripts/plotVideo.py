@@ -14,21 +14,24 @@ from matplotlib.animation import FuncAnimation
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from src import LOG_DIR, DATA_DIR
 import torch
+import scipy.misc
 
 def plot_fig(grnd, pred, filename):
 	fig = plt.figure()
 	ax = plt.axes()
 
-	#LossModel = torch.nn.L1Loss(size_average=True)
-	LossModel = torch.nn.BCELoss(size_average=True)
+	LossModel = torch.nn.L1Loss(size_average=True)
+	#LossModel = torch.nn.BCELoss(size_average=True)
 	#size = grnd.size()
 	loss = LossModel(pred,grnd).data.numpy()
 
-	f = torch.cat([grnd,pred], dim=0).data.numpy()
-	image = ax.imshow(f)
-	plt.text(0,0,"Loss: %.4f" % loss)
-	plt.savefig("%d_%s" % (np.round(loss*1000)-500,filename))
+	#f = torch.cat([grnd,pred], dim=0).data.numpy()
+	#image = ax.imshow(f)
+	#plt.text(0,0,"Loss: %.4f" % loss)
+	#plt.savefig("%d_%s" % (np.round(loss*1000)-500,filename))
 	#plt.show()
+
+	scipy.misc.imsave(filename,pred.data.numpy())
 
 	return loss
 
@@ -64,6 +67,6 @@ def plot_figs(experiment_name='Test', test_name='test'):
 
 
 if __name__=='__main__':
-	experiment_name='VAETest'
+	experiment_name='CentreTest'
 	plot_figs(experiment_name=experiment_name, test_name='video')
 

@@ -15,6 +15,7 @@ from PIL import Image
 # import pickle as pkl
 import _pickle as pkl
 import matplotlib.pylab as plt
+import scipy.ndimage
 
 from os import listdir
 from os.path import isfile
@@ -68,10 +69,12 @@ class CentresDataset(Dataset):
 				data = pkl.load(fin, encoding='latin1')
 			# data = pkl.load(path)
 			data_size = data["in"].shape
-			#print(data_size[0])
 			gradT,gradX,gradY = np.mgrid[0:data_size[0],0:data_size[1],0:data_size[2]]/np.max(data_size) #normalized
-			data_mov = data["in"]
-			data_mov = (data_mov-np.min(data_mov))/(np.max(data_mov)-np.min(data_mov))
+			W = 86
+			xx, yy = np.ogrid[:W,:W]
+			selF = np.uint8( (xx-(W-1)/2.0)**2 + (yy-(W-1)/2.0)**2 < (W/2.0)**2 )
+			data_mov = data["in"]+np.random.normal(0, 1, size=data["in"].shape)*0.05*np.max(data["in"])
+			data_mov = (data_mov-np.min(data_mov))/(np.max(data_mov)-np.min(data_mov))*selF
 			IN = np.array([data_mov,gradT,gradX,gradY])
 
 			if(np.max(data_mov) > 1.0):
@@ -81,6 +84,11 @@ class CentresDataset(Dataset):
 			#torch_x = torch_x/torch.max(torch_x[0])
 		
 			data_size = data["out"].shape
+			data["out"] = (np.max(data["out"])==data["out"])*1.0
+			#print(np.max(data["out"]))
+			oreol=scipy.ndimage.gaussian_filter(data["out"], sigma=1)
+			oreol = 1.0 * oreol/np.max(oreol)
+			data["out"]= data["out"]*0.0+oreol
 			torch_y = torch.from_numpy(data["out"].reshape((data_size[0], data_size[1])).astype('float32'))
 			torch_y = torch_y/torch.max(torch_y)
 		
@@ -124,7 +132,7 @@ class CentresDataset(Dataset):
 		
 		
 
-def get_stream_centres(dataset_dir, list_name, batch_size = 10, shuffle = True):
+def get_stream_centres(dataset_dir, list_name, batch_size = 100, shuffle = True):
 	dataset = CentresDataset(dataset_dir, list_name)
 	trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=10)
 	return trainloader
