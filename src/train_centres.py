@@ -50,6 +50,8 @@ if __name__=='__main__':
 							lr=float(args.lr))
 		
 	
+	#trainer.load_models(epoch, MDL_DIR)
+	#image_model.load_state_dict(torch.load(os.path.join(MDL_DIR,'start.th')))
 		
 	
 	data_path = os.path.join(CENTRES_DIR, args.dataset_dir)

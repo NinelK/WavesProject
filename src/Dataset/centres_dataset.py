@@ -40,7 +40,7 @@ class CentresDataset(Dataset):
 		"""
 
 		self.dataset_dir = dataset_dir
-		
+
 		self.list_path = list_path
 		self.targets = []
 		
@@ -84,11 +84,14 @@ class CentresDataset(Dataset):
 			#torch_x = torch_x/torch.max(torch_x[0])
 		
 			data_size = data["out"].shape
-			data["out"] = (np.max(data["out"])==data["out"])*1.0
-			#print(np.max(data["out"]))
-			oreol=scipy.ndimage.gaussian_filter(data["out"], sigma=1)
-			oreol = 1.0 * oreol/np.max(oreol)
-			data["out"]= data["out"]*0.0+oreol
+			if (np.sum(data["out"]/np.max(data["out"])) < 50):	#56 for sigma=3, 25 for 2,
+				data["out"] = (np.max(data["out"])==data["out"])*1.0
+				#print(np.max(data["out"]))
+				oreol=scipy.ndimage.gaussian_filter(data["out"], sigma=3)
+				oreol = 1.0 * oreol/np.max(oreol)
+				#print(np.sum(oreol))
+				data["out"]= data["out"]*0.0+oreol
+			#data["out"] /= np.sum(data["out"])
 			torch_y = torch.from_numpy(data["out"].reshape((data_size[0], data_size[1])).astype('float32'))
 			torch_y = torch_y/torch.max(torch_y)
 		
@@ -97,7 +100,7 @@ class CentresDataset(Dataset):
 		elif path.split('.')[-1] == 'png':
 			with open(path, 'rb') as fin:
 				data = np.asarray(Image.open(fin))
-		
+
 			data_size = data.shape
 			gradT,gradX,gradY = np.mgrid[0:data_size[0],0:data_size[1],0:data_size[2]]/np.max(data_size) #normalized
 			data = data/np.max(data)
