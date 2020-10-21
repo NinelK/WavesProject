@@ -3,7 +3,7 @@ import sys
 import torch
 import argparse
 from Training import CentresTrainer
-from Models import CentresModel
+from Models import CentresModel, get_mask
 from Dataset import get_stream_centres
 from tqdm import tqdm
 from torch import nn
@@ -21,7 +21,7 @@ if __name__=='__main__':
 	parser.add_argument('-dataset_dir', default='', help='Image prediction model')
 			
 	parser.add_argument('-lr', default=0.001, help='Learning rate', type=float)
-	parser.add_argument('-max_epoch', default=300, help='Max epoch', type=int)
+	parser.add_argument('-max_epoch', default=100, help='Max epoch', type=int)
 	parser.add_argument('-save_interval', default=10, help='Model saving interval in epochs', type=int)
 
 	args = parser.parse_args()
@@ -61,11 +61,7 @@ if __name__=='__main__':
 	stream_train = get_stream_centres(data_path, 'training_set.dat')
 	stream_valid = get_stream_centres(data_path, 'validation_set.dat')
 	
-	W = 86
-	xx, yy = np.ogrid[:W,:W]
-	sel = np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32")
-	mask = torch.from_numpy(sel)
-	mask = Variable(mask.cuda())
+	mask = get_mask()
 
 	for epoch in range(args.max_epoch):
 		loss_train = []

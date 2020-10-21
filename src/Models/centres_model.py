@@ -3,6 +3,17 @@ import sys
 import torch.nn as nn 
 import torch
 
+class Interpolate(nn.Module):
+    def __init__(self, size, mode):
+        super(Interpolate, self).__init__()
+        self.interp = nn.functional.interpolate
+        self.size = size
+        self.mode = mode
+        
+    def forward(self, x):
+        x = self.interp(x, size=self.size, mode=self.mode, align_corners=False)
+        return x
+
 class CentresModel(nn.Module):
 
 	def __init__(self, num_input_channels = 4):
@@ -29,7 +40,7 @@ class CentresModel(nn.Module):
 			nn.ConvTranspose2d(16, 1, kernel_size = 3, stride = 1, padding = 0, bias=True),
 			nn.ReLU(),
 
-			nn.Upsample(size=(86, 86),mode='bilinear')
+			Interpolate(size=(86, 86),mode='bilinear')
 		)
 
 	def forward(self, input):

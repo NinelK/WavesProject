@@ -3,7 +3,7 @@ import sys
 import torch
 import argparse
 from Training import CentresTrainer
-from Models import CentresModel
+from Models import CentresModel, get_mask
 from Dataset import get_stream_centres
 from tqdm import tqdm
 from torch import nn
@@ -65,11 +65,7 @@ if __name__=='__main__':
 	
 	stream_valid = get_stream_centres(data_path, 'validation_set.dat')
 
-	W = 86
-	xx, yy = np.ogrid[:W,:W]
-	sel = np.array((xx-(W-1)/2)**2 + (yy-(W-1)/2)**2 < (43)**2).astype("float32")
-	mask = torch.from_numpy(sel)
-	mask = Variable(mask.cuda())
+	mask = get_mask()
 	
 	trainer.new_log(os.path.join(EXP_DIR,"test_loss.dat"), log_dir=os.path.join(EXP_DIR,'test'))
 	for data in tqdm(stream_valid):
