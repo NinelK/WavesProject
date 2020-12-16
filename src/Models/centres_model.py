@@ -46,10 +46,6 @@ class CentresModel(nn.Module):
 	def forward(self, input):
 
 		conv_out = self.conv(input)
-		conv_out = conv_out.squeeze()
-		#print(conv_out.size())
-#
-		deconv_out = self.deconv(conv_out)
+		deconv_out = self.deconv(conv_out.squeeze(-3))
 
-		#print(deconv_out.size())
 		return deconv_out.squeeze()

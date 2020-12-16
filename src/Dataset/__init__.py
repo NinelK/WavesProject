@@ -1,2 +1,2 @@
 from .waves_dataset import get_stream_vae
-from .centres_dataset import get_stream_centres
+from .centres_dataset import get_stream_centres, add_gradients
